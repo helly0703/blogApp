@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -24,7 +26,7 @@ SECRET_KEY = 'django-insecure-xos5+tc9-a_j-o#2t)r)l!!4)i9tz5-mgol+2bj#f8^n&lmudh
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['https://blog-like-fb.herokuapp.com/']
 
 # Application definition
 
@@ -74,15 +76,25 @@ WSGI_APPLICATION = 'BlogApp.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
+
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'blog',
-        'USER': 'postgres',
-        'PASSWORD': 'Helly@123',
-        'HOST': 'localhost',
-        'PORT': '5432',
+
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+
+        'NAME': os.environ.get('DB_NAME'),
+
+        'USER': os.environ.get('DB_USER'),
+
+        'PASSWORD': os.environ.get('DB_PASS'),
+
+        'HOST': os.environ.get('DB_HOST'),
+
+        'PORT': os.environ.get('DB_PORT'),
+
     }
+
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
