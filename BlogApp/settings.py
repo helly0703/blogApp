@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-xos5+tc9-a_j-o#2t)r)l!!4)i9tz5-mgol+2bj#f8^n&lmudh
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['https://blog-like-fb.herokuapp.com/']
+ALLOWED_HOSTS = ['blog-like-fb.herokuapp.com']
 
 # Application definition
 
