@@ -1,17 +1,8 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Logout</title>
-</head>
-<body>
+{% extends 'Account/base.html' %}
+{% block page-title %}Logout-{% endblock %}
+{% block content %}
     <h2>You have been logged out</h2>
-	<div class="border-top pt-3">
-		<small class="text-muted">
-			<a href="{% url 'login' %}" class="ml-2">Log In Again</a></small>
+	<div class="pt-3 h4">
+		<a href="{% url 'login' %}" class="ml-2 ">Log In Again</a>
 	</div>
-</body>
-</html>
+{% endblock content %}

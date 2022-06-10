@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-xos5+tc9-a_j-o#2t)r)l!!4)i9tz5-mgol+2bj#f8^n&lmudh
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['blog-like-fb.herokuapp.com']
+ALLOWED_HOSTS = ['blog-like-fb.herokuapp.com', '127.0.0.1']
 
 # Application definition
 
@@ -149,3 +149,9 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 LOGIN_REDIRECT_URL = 'home/'
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
