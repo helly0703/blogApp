@@ -8,7 +8,7 @@ class Account(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(null='', max_length=50)
     image = models.ImageField(default='default.jpg', upload_to='profile_pics')
-    birthday = models.DateField(null=True)
+    birthday = models.DateField(null=True,default=True)
     gender = models.CharField(null=True,
         max_length=6,
         choices=[('MALE', 'MALE'), ('FEMALE', 'FEMALE')]
