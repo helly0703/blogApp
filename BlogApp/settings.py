@@ -31,7 +31,6 @@ ALLOWED_HOSTS = ['blog-like-fb.herokuapp.com', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
-    # 'blogs.apps.BlogsConfig',
     'Account.apps.UsersConfig',
     'crispy_forms',
     'django.contrib.admin',
@@ -147,7 +146,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Added
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-LOGIN_REDIRECT_URL = 'home/'
+LOGIN_REDIRECT_URL = 'home'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
