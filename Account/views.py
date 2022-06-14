@@ -3,6 +3,8 @@ from django.contrib import messages
 from .forms import UserRegisterForm
 from django.contrib.auth.decorators import login_required
 from Account.forms import UserUpdateForm, AccountUpdateForm
+from django.contrib.auth.decorators import user_passes_test
+
 
 
 # Register new user
@@ -21,7 +23,10 @@ def register(request):
 
 @login_required()
 def home(request):
-    return render(request, 'Account/home.html')
+    if not request.user.is_authenticated:
+        return redirect('login')
+    else:
+        return render(request, 'Account/home.html')
 
 
 # View user profile and save changes if updated

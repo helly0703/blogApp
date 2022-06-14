@@ -14,6 +14,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 <body>
+    {% if user.is_authenticated %}
     <h5>
         <a href="{% url 'home' %}" class="ml-2">Home</a>
         <a href="{% url 'logout' %}" class="ml-2">Logout</a>
@@ -50,5 +51,8 @@
             </div>
         </div>
     </div>
+    {% else %}
+        <small class="text-muted"><a href="{% url 'login' %}" class="ml-2">Login</a></small>
+    {% endif %}
 </body>
 </html>
