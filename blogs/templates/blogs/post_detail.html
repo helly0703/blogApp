@@ -1,0 +1,61 @@
+{% extends 'blogs/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container bootstrap snippets bootdey">
+    <div class="col-md-8">
+      <div class="box box-widget">
+        <div class="box-header with-border">
+          <div class="user-block">
+            <img class="rounded-circle" src="{{ post.author.account.image.url }}" alt="User Image" height="50px"
+                 width="50px">
+            <span class="username"><a href="#">{{ post.author }}</a></span>
+            <span class="description">Shared publicly - 7:30 PM Today</span>
+          </div>
+        </div>
+
+        <div class="box-body" style="display: block;">
+          <h3>{{ post.title }}</h3>
+          <img class="img-responsive pad" src="{{ post.image.url }}" alt="Photo">
+          <p>{{ post.content }}</p>
+          <button type="button" class="btn btn-default btn-xs"><i class="fa fa-share"></i> Share</button>
+          <button type="button" class="btn btn-default btn-xs"><i class="fa fa-thumbs-o-up"></i> Like</button>
+          {% if object.author == user %}
+            <a href="{% url 'post-update' object.id %}" class="btn btn-outline-secondary">Update</a>
+            <a href="{% url 'post-delete' object.id %}" class="btn btn-outline-secondary">Delete</a>
+          {% endif %}
+          <a href="{% url 'blogs' %}" class="btn btn-outline-secondary">Back</a>
+
+          <span class="pull-right text-muted">127 likes - 3 comments</span>
+        </div>
+
+<!-- Comments section-->
+        <div class="box-footer box-comments" style="display: block; background-color:#f7f7f7">
+          <h3>Comments</h3>
+          <div class="box-comment">
+            <img class="rounded-circle" src="#" alt="User Image" height="50px"
+                 width="50px">
+            <div class="comment-text">
+              <span class="username">
+              Maria Gonzales
+              <span class="text-muted pull-right">8:03 PM Today</span>
+              </span>
+              It is a long established fact that a reader will be distracted
+              by the readable content of a page when looking at its layout.
+            </div>
+          </div>
+        </div>
+        <div class="box-footer" style="display: block; background-color:#f7f7f7">
+          <form action="#" method="post">
+            <img class="rounded-circle" src="{{ post.author.account.image.url }} height="50px"
+                 width="50px""
+                 alt="{{ post.author }}">
+            <div class="img-push">
+              <input type="text" class="form-control input-sm" placeholder="Press enter to post comment">
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+</div>
+{% endblock content %}

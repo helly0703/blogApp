@@ -3,8 +3,6 @@ from django.contrib import messages
 from .forms import UserRegisterForm
 from django.contrib.auth.decorators import login_required
 from Account.forms import UserUpdateForm, AccountUpdateForm
-from django.contrib.auth.decorators import user_passes_test
-
 
 
 # Register new user

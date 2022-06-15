@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -5,18 +6,40 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <link rel="stylesheet" href="{% static 'users/main.css'%}">
+    <link rel="stylesheet" href="{% static 'blogs/main.css'%}">
+
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <title>Home</title>
 </head>
 <body>
     {% if user.is_authenticated %}
-      <p>This is home page</p>
-      <div class="border-top pt-3">
-        <small class="text-muted"><a href="{% url 'logout' %}" class="ml-2">Logout</a></small>
-        <small class="text-muted"><a href="{% url 'profile' %}" class="ml-2">Profile</a></small>
-      </div>
-    {% else %}
+    <nav class="nav nav-borders">
+        <a class="nav-link active ms-0" href="{% url 'profile' %}" target="__blank">Profile</a>
+        <a class="nav-link" href="{% url 'blogs' %}" target="__blank" >Feed
+        </a>
+        <a class="nav-link" href="#" target="__blank">Friends</a>
+        <a class="nav-link" href="#"  target="__blank">Notifications</a>
+        <a class="nav-link" href="{% url 'logout' %}"
+           target="__blank">Logout</a>
+
+    </nav>
+    <div>
+        <h3>Hello, {{ user.username}}</h3>
+        {% block content %}{% endblock content %}
+
+    </div>
+    <hr class="mt-0 mb-4">
+     {% else %}
+    <div>
+        <h3>You are logged out</h3>
         <small class="text-muted"><a href="{% url 'login' %}" class="ml-2">Login</a></small>
+    </div>
     {% endif %}
+
 </body>
 </html>
+
 
