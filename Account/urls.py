@@ -1,12 +1,18 @@
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from Account import views
-
+from Account.views import FriendView, FriendDetailView, AddFriendView
 
 urlpatterns = [
     path('', views.register, name='register'),
     path('home', views.home, name='home'),                     # Takes to the blogs page after login
     path('home/profile/', views.profile, name='profile'),       # Takes to the user profile page
+    path('home/friends/', FriendView.as_view(), name='friendspage'),
+    path('home/friends/<int:pk>/', FriendDetailView.as_view(), name='friend_detail'),
+    path('home/friends/<int:pk>/add', AddFriendView.as_view(), name='friend_request'),
+
+
+
     path('accounts/login/', auth_views.LoginView.as_view(template_name='Account/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name='Account/logout.html'), name='logout'),
 
@@ -23,6 +29,7 @@ urlpatterns = [
          auth_views.PasswordResetCompleteView.as_view(template_name='Account/password_reset_complete.html'),
          name='password_reset_complete'),
     path('home/blogs/', include('blogs.urls'), name='blogs'),
+
 
 ]
 

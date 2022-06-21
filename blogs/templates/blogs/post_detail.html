@@ -19,7 +19,12 @@
           <img class="img-responsive pad" src="{{ post.image.url }}" alt="Photo">
           <p>{{ post.content }}</p>
           <button type="button" class="btn btn-default btn-xs"><i class="fa fa-share"></i> Share</button>
-          <button type="button" class="btn btn-default btn-xs"><i class="fa fa-thumbs-o-up"></i> Like</button>
+          <form action="{% url 'post-like' object.id%}" method="post">
+            {% csrf_token%}
+            <input type="hidden" name="post_id" value="{{object.id}}">
+            <button type="submit" class="btn btn-default btn-xs"><i class="fa fa-thumbs-o-up"></i> Like</button>
+          </form>
+
           {% if object.author == user %}
             <a href="{% url 'post-update' object.id %}" class="btn btn-outline-secondary">Update</a>
             <a href="{% url 'post-delete' object.id %}" class="btn btn-outline-secondary">Delete</a>

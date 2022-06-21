@@ -1,6 +1,6 @@
 from django.db import models
 from PIL import Image
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AbstractUser
 from datetime import date
 
 
@@ -17,6 +17,7 @@ class Account(models.Model):
     privacy_mode = models.CharField(null=True,max_length=7, choices=[('PUBLIC', 'PUBLIC'), ('PRIVATE', 'PRIVATE')])
     allow_notification = models.BooleanField(null=True)
     description = models.CharField(default=' ',null=True,max_length=50)
+    friendslist = models.ManyToManyField(User,related_name='friendslist',null=True, default=None)
 
     def __str__(self):
         return f'{self.user.username}'
@@ -30,3 +31,18 @@ class Account(models.Model):
             output_size = (300, 300)
             img.thumbnail(output_size)
             img.save(self.image.path)
+
+
+STATUS_CHOICES = (
+    ('send', 'send'),
+    ('accepted', 'accepted')
+)
+
+
+class Relationship(models.Model):
+    sender = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='sender')
+    receiver = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='receiver')
+    status = models.CharField(max_length=8, choices=STATUS_CHOICES)
+
+    def __str__(self):
+        return f'{self.sender}'

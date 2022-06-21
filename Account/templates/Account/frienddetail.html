@@ -1,0 +1,28 @@
+{% extends 'Account/home_base.html' %}
+{% load static %}
+{% block content %}
+{% load crispy_forms_tags %}
+
+    {% if user.is_authenticated %}
+        <div class="container">
+                <div class="row">
+                  <div class="col-md-2 col-sm-2">
+                    <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="user" height="50px"
+                         width="50px">
+                  </div>
+                  <div class="col-md-7 col-sm-7">
+                    <h5>{{ object.username }}</h5>
+<!--                    <p>{{ object.account.name }}</p>-->
+<!--                    <p class="text-muted">{{ object.account.description }}</p>-->
+                  </div>
+                  <div class="col-md-3 col-sm-3">
+                      <a href="{% url 'friend_request'  object.id %}" class="btn btn-primary">Add Friend</a>
+
+<!--                    <button class="btn btn-primary pull-right">Add Friend</button>-->
+                  </div>
+                </div>
+        </div>
+    {% else %}
+        <small class="text-muted"><a href="{% url 'login' %}" class="ml-2">Login</a></small>
+    {% endif %}
+{% endblock content %}

@@ -1,8 +1,13 @@
+from django.http import HttpResponse
+from django.views import View
+from django.views.generic import ListView, DetailView
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.contrib.auth.models import User
 from .forms import UserRegisterForm
 from django.contrib.auth.decorators import login_required
 from Account.forms import UserUpdateForm, AccountUpdateForm
+from .models import Account
 
 
 # Register new user
@@ -13,7 +18,7 @@ def register(request):
             form.save()
             username = form.cleaned_data.get('username')
             messages.success(request, f'Account created for {username}!')
-            return redirect('login')     # After account creation redirects to login page
+            return redirect('login')  # After account creation redirects to login page
     else:
         form = UserRegisterForm()
     return render(request, 'Account/register.html', {'form': form})
@@ -24,11 +29,11 @@ def home(request):
     if not request.user.is_authenticated:
         return redirect('login')
     else:
-        return render(request, 'Account/home.html')
+        return render(request, 'Account/profile.html')
 
 
 # View user profile and save changes if updated
-@login_required(login_url='login')              # if not login redirect to login page
+@login_required(login_url='login')  # if not login redirect to login page
 def profile(request):
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=request.user)
@@ -50,3 +55,32 @@ def profile(request):
         'p_form': p_form
     }
     return render(request, 'Account/profile.html', context)
+
+
+class FriendView(ListView):
+    model = User
+    template_name = 'Account/friendspage.html'
+
+
+class FriendDetailView(DetailView):
+    model = User
+    template_name = 'Account/frienddetail.html'
+
+
+class AddFriendView(View):
+    def get(self):
+        new_friend = self.Account.friends.add(self.user.id)
+        new_friend.save()
+
+        return HttpResponse('result')
+
+
+
+
+# def makeFriends(request):
+#     print(request.user)
+#     user_id = request.user
+#     friend_id = request.object
+#     user_id.friendlist.add(friend_id)
+#     user_id.save()
+#     return HttpResponse('Friend request sent')
