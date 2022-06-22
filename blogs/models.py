@@ -22,6 +22,10 @@ class Post(models.Model):
     def num_of_likes(self):
         return self.liked.all().count()
 
+    def num_of_comments(self):
+        comments = Comment.objects.all().filter(post=self).count()
+        return comments
+
     def get_absolute_url(self):
         return reverse('post-detail', kwargs={'pk': self.pk})
 
@@ -47,6 +51,7 @@ class Comment(models.Model):
 
     def __str__(self):
         return str(self.pk)
+
 
 
 LIKE_CHOICES = (

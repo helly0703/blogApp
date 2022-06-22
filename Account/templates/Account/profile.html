@@ -4,11 +4,6 @@
 {% load crispy_forms_tags %}
 
     {% if user.is_authenticated %}
-<!--    <h5>-->
-<!--        <a href="{% url 'home' %}" class="ml-2">Home</a>-->
-<!--        <a href="{% url 'logout' %}" class="ml-2">Logout</a>-->
-
-<!--    </h5>-->
     <div class="container-xl px-4 mt-4">
         <hr class="mt-0 mb-4">
         <div class="row">
@@ -21,6 +16,7 @@
                         <img style="width: 245px; height: 247px;"  alt="Image description"
                              src="{{ user.account.image.url }}"/>
                         <h3>{{ user.account.name }}</h3>
+                        <a href="{% url 'change_password' %}">Change Password</a>
                     </div>
                 </div>
             </div>
@@ -35,6 +31,8 @@
                             {{ p_form|crispy }}
                             <button class="btn btn-primary"  type="submit">Save changes</button>
                         </form>
+                        <br>
+                        <a class="btn btn-secondary" href="{% url 'home' %}">Update Profile</a>
                     </div>
                 </div>
             </div>

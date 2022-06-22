@@ -4,19 +4,19 @@ from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
 
 from Account.models import Account
-from .models import Post, Like
+from .models import Post, Like, Comment
 from django.http import HttpResponseRedirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 
 
 # Create your views here.
-class HomeView(ListView):
+class HomeView(LoginRequiredMixin,ListView):
     model = Post
     template_name = 'blogs/feed.html'
 
 
-class PostDetailView(DetailView):
+class PostDetailView(LoginRequiredMixin,DetailView):
     model = Post
     template_name = 'blogs/post_detail.html'
 
@@ -60,19 +60,14 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             return False
 
 
-class PostLikeView(View):
-
+class PostLikeView(LoginRequiredMixin,View):
     def post(self,request,*args,**kwargs):
         user = self.request.user
-        print(user)
         pk = kwargs['pk']
-        print(kwargs)
         if request.method == 'POST':
             post_id = request.POST.get('post_id')
-            print(post_id)
             post_obj = Post.objects.get(id=post_id)
             profile = Account.objects.get(user=user)
-
             if profile in post_obj.liked.all():
                 post_obj.liked.remove(profile)
             else:
@@ -90,32 +85,29 @@ class PostLikeView(View):
                 like.save()
         return redirect('blog-post', pk=pk)
 
-# def like_unlike_view(request, *args, **kwargs):
-#     user = request.user
-#     print(user)
-#     pk = kwargs['pk']
-#     print(kwargs)
-#     if request.method == 'POST':
-#         post_id = request.POST.get('post_id')
-#         print(post_id)
-#         post_obj = Post.objects.get(id=post_id)
-#         profile = Account.objects.get(user=user)
-#
-#         if profile in post_obj.liked.all():
-#             post_obj.liked.remove(profile)
-#         else:
-#             post_obj.liked.add(profile)
-#
-#         like, created = Like.objects.get_or_create(user=profile, post_id=post_id)
-#
-#         if not created:
-#             if like.value == 'Like':
-#                 like.value = 'Unlike'
-#             else:
-#                 like.value = 'Like'
-#
-#             post_obj.save()
-#             like.save()
-#     return redirect('blog-post', pk=pk)
+
+class PostCommentCreateView(LoginRequiredMixin,View):
+
+    def post(self,request,*args,**kwargs):
+        pk = kwargs['pk']
+        user = self.request.user
+        if request.method == 'POST':
+            post_id = request.POST.get('post_id')
+            comment = request.POST.getlist("comment")
+            profile = Account.objects.get(user=user)
+            Comment.objects.get_or_create(user=profile, post_id=post_id,body =comment[0])
+        return redirect('blog-post', pk=pk)
+
+
+class PostCommentListView(LoginRequiredMixin,ListView):
+    model = Comment
+    template_name = 'blogs/feed.html'
+
+    def get_queryset(self,**kwargs):
+        pk = kwargs['pk']
+        print(pk)
+        queryset = super().get_queryset()
+        return queryset.filter(post_id=pk)
+
 
 

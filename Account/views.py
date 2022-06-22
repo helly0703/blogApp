@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.views import View
 from django.views.generic import ListView, DetailView
@@ -29,7 +30,7 @@ def home(request):
     if not request.user.is_authenticated:
         return redirect('login')
     else:
-        return render(request, 'Account/profile.html')
+        return render(request, 'Account/profile_view.html')
 
 
 # View user profile and save changes if updated
@@ -57,30 +58,20 @@ def profile(request):
     return render(request, 'Account/profile.html', context)
 
 
-class FriendView(ListView):
+class FriendView(LoginRequiredMixin, ListView):
     model = User
     template_name = 'Account/friendspage.html'
 
 
-class FriendDetailView(DetailView):
+class FriendDetailView(LoginRequiredMixin,DetailView):
     model = User
     template_name = 'Account/frienddetail.html'
 
 
-class AddFriendView(View):
+class AddFriendView(LoginRequiredMixin, View):
     def get(self):
-        new_friend = self.Account.friends.add(self.user.id)
+        new_friend = Account.friendslist.add(self)
         new_friend.save()
 
         return HttpResponse('result')
 
-
-
-
-# def makeFriends(request):
-#     print(request.user)
-#     user_id = request.user
-#     friend_id = request.object
-#     user_id.friendlist.add(friend_id)
-#     user_id.save()
-#     return HttpResponse('Friend request sent')

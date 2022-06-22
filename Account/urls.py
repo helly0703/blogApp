@@ -28,6 +28,10 @@ urlpatterns = [
     path('password-reset-complete/',
          auth_views.PasswordResetCompleteView.as_view(template_name='Account/password_reset_complete.html'),
          name='password_reset_complete'),
+    path('change-password/', auth_views.PasswordChangeView.as_view(template_name='Account/change-password.html',
+                                                                   success_url = '/'),
+        name='change_password'
+    ),
     path('home/blogs/', include('blogs.urls'), name='blogs'),
 
 

@@ -18,11 +18,16 @@
           <h3>{{ post.title }}</h3>
           <img class="img-responsive pad" src="{{ post.image.url }}" alt="Photo">
           <p>{{ post.content }}</p>
-          <button type="button" class="btn btn-default btn-xs"><i class="fa fa-share"></i> Share</button>
+
+<!--          <button type="button" class="btn btn-default btn-xs"><i class="fa fa-share"></i> Share</button>-->
           <form action="{% url 'post-like' object.id%}" method="post">
             {% csrf_token%}
             <input type="hidden" name="post_id" value="{{object.id}}">
-            <button type="submit" class="btn btn-default btn-xs"><i class="fa fa-thumbs-o-up"></i> Like</button>
+            {% if user.account in object.liked.all %}
+                <button type="submit" class="btn btn-default btn-xs"><i class="fa fa-thumbs-o-up"></i> Like</button>
+            {% else %}
+                <button type="submit" class="btn btn-secondary btn-xs"><i class="fa fa-thumbs-o-up"></i> UnLike</button>
+            {% endif %}
           </form>
 
           {% if object.author == user %}
@@ -31,7 +36,8 @@
           {% endif %}
           <a href="{% url 'blogs' %}" class="btn btn-outline-secondary">Back</a>
 
-          <span class="pull-right text-muted">127 likes - 3 comments</span>
+          <span class="pull-right text-muted">{{ post.num_of_likes }} likes - {{ post.num_of_comments }}
+            comments</span>
         </div>
 
 <!-- Comments section-->
@@ -51,12 +57,18 @@
           </div>
         </div>
         <div class="box-footer" style="display: block; background-color:#f7f7f7">
-          <form action="#" method="post">
+          <form action="{% url 'post-comment' object.id%}" method="post">
             <img class="rounded-circle" src="{{ post.author.account.image.url }} height="50px"
                  width="50px""
                  alt="{{ post.author }}">
             <div class="img-push">
-              <input type="text" class="form-control input-sm" placeholder="Press enter to post comment">
+              {% csrf_token%}
+              <input type="hidden" name="post_id" value="{{object.id}}">
+              <input type="text" class="form-control input-sm" placeholder="Press enter to post comment"
+                     name="comment">
+
+              <button type="submit">Comment</button>
+
             </div>
           </form>
         </div>
