@@ -1,4 +1,4 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponse
 from django.views import View
 from django.views.generic import ListView, DetailView
@@ -68,10 +68,6 @@ class FriendDetailView(LoginRequiredMixin,DetailView):
     template_name = 'Account/frienddetail.html'
 
 
-class AddFriendView(LoginRequiredMixin, View):
-    def get(self):
-        new_friend = Account.friendslist.add(self)
-        new_friend.save()
-
-        return HttpResponse('result')
+class AddFriendView(LoginRequiredMixin,UserPassesTestMixin, View):
+    pass
 
