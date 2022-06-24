@@ -4,23 +4,57 @@
 {% load crispy_forms_tags %}
 
     {% if user.is_authenticated %}
-        <div class="container">
-                <div class="row">
-                  <div class="col-md-2 col-sm-2">
-                    <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="user" height="50px"
-                         width="50px">
-                  </div>
-                  <div class="col-md-7 col-sm-7">
-                    <h5>{{ object.username }}</h5>
-<!--                    <p>{{ object.account.name }}</p>-->
-<!--                    <p class="text-muted">{{ object.account.description }}</p>-->
-                  </div>
-                  <div class="col-md-3 col-sm-3">
-                      <a href="{% url 'friend_request'  object.id %}" class="btn btn-primary">Add Friend</a>
-
-<!--                    <button class="btn btn-primary pull-right">Add Friend</button>-->
-                  </div>
+        <div class="container-xl px-4 mt-4">
+            <hr class="mt-0 mb-4">
+            <div class="row">
+                <div class="col-xl-4">
+                    <!-- Profile picture card-->
+                    <div class="card mb-4 mb-xl-0">
+                        <div class="card-header text-center">Profile Picture</div>
+                        <div class="card-body text-center">
+                            <!-- Profile picture image-->
+                            <img style="width: 245px; height: 247px;" alt="Image description"
+                                 src="{{ user.account.image.url }}"/>
+                            <h3>{{ object.name }}</h3>
+                        </div>
+                    </div>
                 </div>
+                <div class="col-xl-8">
+                    <!-- Account details card-->
+                    <div class="card mb-4">
+                        <div class="card-header">Account Details</div>
+                        <div class="card-body">
+                            <table>
+                                <tr>
+                                    <td>Username</td>
+                                    <td>{{object.user.username}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Email</td>
+                                    <td>{{object.user.email}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>{{object.user.account.name}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Birthday</td>
+                                    <td>{{object.user.account.birthday}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Gender</td>
+                                    <td>{{user.account.gender}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Description</td>
+                                    <td>{{user.account.description}}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <a type="button" class="btn btn-secondary" href="#">Remove Friend</a>
+                </div>
+            </div>
         </div>
     {% else %}
         <small class="text-muted"><a href="{% url 'login' %}" class="ml-2">Login</a></small>

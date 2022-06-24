@@ -26,6 +26,10 @@ class Post(models.Model):
         comments = Comment.objects.all().filter(post=self).count()
         return comments
 
+    def get_comments(self):
+        commment_list = Comment.objects.all().filter(post=self)[:5]
+        return commment_list
+
     def get_absolute_url(self):
         return reverse('post-detail', kwargs={'pk': self.pk})
 
@@ -51,6 +55,10 @@ class Comment(models.Model):
 
     def __str__(self):
         return str(self.pk)
+
+
+    class Meta:
+        ordering = ('-created',)
 
 
 

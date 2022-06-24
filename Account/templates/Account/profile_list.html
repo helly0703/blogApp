@@ -1,0 +1,55 @@
+{% extends 'Account/home_base.html' %}
+{% load static %}
+{% block content %}
+{% load crispy_forms_tags %}
+    <form class="search-bar justify-content-start">
+			<input type="text" class="form-control" name="q" id="id_q_large" placeholder="Search...">
+    </form>
+    {% if user.is_authenticated %}
+        <div class="container">
+            {% for object in qs %}
+                <div class="row" style="padding-bottom:2px">
+                  <div class="col-md-2 col-sm-2">
+                    <img src="{{ object.image.url }}" alt="user" height="50px"
+                         width="50px" style="border-radius:50%">
+                  </div>
+                  <div class="col-md-7 col-sm-7">
+                    <h5><a href="#" class="profile-link">{{ object }}</a></h5>
+                  </div>
+                  <div class="col-md-3 col-sm-3">
+
+                    {% if object.user not in rel_receiver and object.user not in rel_sender and request.user not in object.friendslist.all%}
+                      <form action="{% url 'sendinvite' %}" method="post">
+                        {% csrf_token%}
+                          <input type="hidden" name="profile_pk" value="{{ object.id }}">
+                          <button type="submit" class="btn btn-primary pull-right">Add Friend</button>
+                      </form>
+                    {% endif %}
+
+                    {% if object.user in rel_receiver and request.user not in object.friendslist.all%}
+                        <button type="submit" class="btn btn-primary">Waiting for response</button>
+                    {% endif %}
+
+                    {% if request.user in  object.friendslist.all %}
+                        <form action="{%url 'removefriend' %}" method="post">
+                          {% csrf_token%}
+                            <input type="hidden" name="profile_pk" value="{{ object.id }}">
+                            <button class="btn btn-primary pull-right">Remove from friends</button>
+                        </form>
+                    {% endif %}
+
+                  </div>
+                </div>
+            <hr>
+            {% endfor%}
+            <input name="user-input" id="user-input" placeholder="Search">
+
+            <div id="replaceable-content" class="col-6">
+            </div>
+        </div>
+    {% else %}
+        <small class="text-muted"><a href="{% url 'login' %}" class="ml-2">Login</a></small>
+    {% endif %}
+
+{% endblock content %}
+

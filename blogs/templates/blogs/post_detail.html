@@ -9,8 +9,8 @@
           <div class="user-block">
             <img class="rounded-circle" src="{{ post.author.account.image.url }}" alt="User Image" height="50px"
                  width="50px">
-            <span class="username"><a href="#">{{ post.author }}</a></span>
-            <span class="description">Shared publicly - 7:30 PM Today</span>
+            <span class="username" style="font-size:20px"><a href="#">{{ post.author }}</a></span>
+            <span class="description">Posted on {{ post.date_posted }}</span>
           </div>
         </div>
 
@@ -41,36 +41,38 @@
         </div>
 
 <!-- Comments section-->
-        <div class="box-footer box-comments" style="display: block; background-color:#f7f7f7">
-          <h3>Comments</h3>
-          <div class="box-comment">
-            <img class="rounded-circle" src="#" alt="User Image" height="50px"
-                 width="50px">
-            <div class="comment-text">
-              <span class="username">
-              Maria Gonzales
-              <span class="text-muted pull-right">8:03 PM Today</span>
-              </span>
-              It is a long established fact that a reader will be distracted
-              by the readable content of a page when looking at its layout.
-            </div>
-          </div>
-        </div>
+        <h3>Comments</h3>
         <div class="box-footer" style="display: block; background-color:#f7f7f7">
           <form action="{% url 'post-comment' object.id%}" method="post">
-            <img class="rounded-circle" src="{{ post.author.account.image.url }} height="50px"
-                 width="50px""
-                 alt="{{ post.author }}">
             <div class="img-push">
               {% csrf_token%}
+              <img class="rounded-circle" src="{{ post.author.account.image.url }}" height="20px"
+                 width="20px"
+                 alt="{{ post.author }}">
               <input type="hidden" name="post_id" value="{{object.id}}">
-              <input type="text" class="form-control input-sm" placeholder="Press enter to post comment"
+              <input type="text" placeholder="Press enter to post comment"
                      name="comment">
-
               <button type="submit">Comment</button>
 
             </div>
           </form>
+        </div>
+        <div class="box-footer box-comments" style="display: block; background-color:#f7f7f7;">
+          {% for comment in post.get_comments%}
+          <div class="box-comment" style="padding-top:3px">
+            <span>
+              <img class="rounded-circle" src="{{ comment.user.user.account.image.url }}" alt="User Image"
+                    height="20px"
+                 width="20px">
+            </span>
+            <span class="username">
+            {{ comment.name }}
+            <span class="text-muted pull-right">{{ comment.created }}</span>
+            </span>
+            <span class="text-muted" style="padding-left:5px">{{ comment.body }}</span>
+            </span>
+          </div>
+          {% endfor %}
         </div>
       </div>
     </div>

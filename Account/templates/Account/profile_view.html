@@ -25,12 +25,6 @@
                 <div class="card mb-4">
                     <div class="card-header">Account Details</div>
                     <div class="card-body">
-<!--                        <form method="POST" enctype="multipart/form-data">-->
-<!--                            {% csrf_token %}-->
-<!--                            {{ u_form|crispy }}-->
-<!--                            {{ p_form|crispy }}-->
-<!--                            <button class="btn btn-primary"  type="submit">Save changes</button>-->
-<!--                        </form>-->
                         <table>
                             <tr>
                                 <td>Username</td>
@@ -59,7 +53,19 @@
                         </table>
                     </div>
                 </div>
-                <a type="button" href="{% url 'profile' %}">Update Profile</a>
+                <table>
+                    <tr>
+                        <td>
+                            <a type="button" class="btn btn-secondary" href="{% url 'profile' %}">Update Profile</a>
+                        </td>
+                        <td>
+                            <a type="button" class="btn btn-secondary" href="{% url 'friendspage' %}">View Friends</a>
+                        </td>
+                        <td>
+                            <a type="button" class="btn btn-secondary" href="#">Settings</a>
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
