@@ -152,7 +152,7 @@ class SendInviteView(LoginRequiredMixin, View):
             sender = Account.objects.get(user=user)
             receiver = Account.objects.get(pk=pk)
             rel = Relationship.objects.create(sender=sender, receiver=receiver, status='send')
-        return redirect(request.META.get('HTTP_REFERER'))
+        return redirect('inviteprofiles')
 
 
 class RemoveFriendView(LoginRequiredMixin, View):

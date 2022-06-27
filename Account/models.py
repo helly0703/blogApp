@@ -9,7 +9,9 @@ class AccountManager(models.Manager):
 
     def get_all_profiles_to_invites(self, sender):
         profiles = Account.objects.all().exclude(user=sender)
+        print(profiles)
         profile = Account.objects.get(user=sender)
+        print(profile)
         qs = Relationship.objects.filter(Q(sender=profile) | Q(receiver=profile))
 
         accepted = []
@@ -19,10 +21,9 @@ class AccountManager(models.Manager):
                 accepted.append(rel.receiver)
                 accepted.append(rel.sender)
             elif rel.status == 'send':
-                accepted.append(rel.sender)
                 accepted.append(rel.receiver)
+                accepted.append(rel.sender)
         print(accepted)
-        print(pending)
 
         available = [profile for profile in profiles if profile not in accepted]
 
