@@ -1,12 +1,16 @@
 {% extends 'Account/home_base.html' %}
 {% load static %}
+{%block title%}
+Add Friends
+{%endblock title%}
 {% block content %}
 {% load crispy_forms_tags %}
-    <form class="search-bar justify-content-start">
-			<input type="text" class="form-control" name="q" id="id_q_large" placeholder="Search...">
-    </form>
     {% if user.is_authenticated %}
         <div class="container">
+            <form action="{% url 'search-profile' %}" name="search-profile" id="search-profile" method="get">
+                {% csrf_token%}
+                <input type="text" id="search_field" name="search_field">
+            </form>
             {% for object in qs %}
                 <div class="row" style="padding-bottom:2px">
                   <div class="col-md-2 col-sm-2">
@@ -18,14 +22,17 @@
                   </div>
                   <div class="col-md-3 col-sm-3">
 <!--                    <button class="btn btn-primary pull-right">Add Friend</button>-->
-                       <form action="{% url 'sendinvite' %}" method="post">
-                        {% csrf_token%}
-                          <input type="hidden" name="profile_pk" value="{{ object.id }}">
 
-                          <button type="submit" class="btn btn-primary pull-right">Add Friend</button>
+                       <form action="{% url 'sendinvite' %}" method="post" >
+                        {% csrf_token%}
+                          <input type="hidden" name="profile_pk" value="{{ object.id }}" >
+
+                          <button type="submit" class="btn btn-primary ">Add Friend</button>
                       </form>
+
                   </div>
                 </div>
+
             {% endfor%}
         </div>
     {% else %}
@@ -33,3 +40,16 @@
     {% endif %}
 
 {% endblock content %}
+
+
+
+{% block script%}
+
+$(document).ready(function(){
+$('#search_field').keyup(function(){
+  $('#search-profile').submit();
+});
+};
+
+{% endblock script%}
+

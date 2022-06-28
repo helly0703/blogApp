@@ -2,9 +2,6 @@
 {% load static %}
 {% block content %}
 {% load crispy_forms_tags %}
-    <form class="search-bar justify-content-start">
-			<input type="text" class="form-control" name="q" id="id_q_large" placeholder="Search...">
-    </form>
     {% if user.is_authenticated %}
         <div class="container">
             {% for object in qs %}

@@ -3,11 +3,11 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, FormView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import User
-from .forms import UserRegisterForm
+from .forms import UserRegisterForm, AccountSettingsForm
 from django.contrib.auth.decorators import login_required
 from Account.forms import UserUpdateForm, AccountUpdateForm
 from .models import Account, Relationship
@@ -52,6 +52,36 @@ def profile(request):
         'p_form': p_form
     }
     return render(request, 'Account/profile.html', context)
+
+
+class SettingsFormView(LoginRequiredMixin, View):
+
+    def get(self, request):
+        u_form = AccountSettingsForm(instance=request.user.account)
+
+        context = {
+            'u_form': u_form
+        }
+        return render(request, 'Account/settings.html', context)
+
+    def post(self, request):
+        if request.method == 'POST':
+            user = Account.objects.get(user=self.request.user)
+            u_form = AccountSettingsForm(request.POST,
+                                         request.FILES,
+                                         instance=request.user.account)
+            if u_form.is_valid():
+                u_form.save()
+                messages.success(request, f'Your account has been updated!')
+                return redirect('settings')
+
+        else:
+            u_form = AccountSettingsForm(instance=request.user.account)
+
+        context = {
+            'u_form': u_form
+        }
+        return render(request, 'Account/settings.html', context)
 
 
 class FriendView(LoginRequiredMixin, ListView):
@@ -151,7 +181,12 @@ class SendInviteView(LoginRequiredMixin, View):
             user = self.request.user
             sender = Account.objects.get(user=user)
             receiver = Account.objects.get(pk=pk)
-            rel = Relationship.objects.create(sender=sender, receiver=receiver, status='send')
+            print(receiver.privacy_mode)
+            if receiver.privacy_mode == 'PUBLIC':
+                Relationship.objects.create(sender=sender, receiver=receiver, status='accepted')
+            else:
+                Relationship.objects.create(sender=sender, receiver=receiver, status='send')
+
         return redirect('inviteprofiles')
 
 
@@ -169,3 +204,14 @@ class RemoveFriendView(LoginRequiredMixin, View):
             return redirect(request.META.get('HTTP_REFERER'))
 
 
+class SearchProfileView(ListView):
+    model = Account
+    template_name = "Account/to_invite_list.html"
+    context_object_name = 'qs'
+
+    def get_queryset(self):
+        query = self.request.GET.get("search_field")
+        qs = Account.objects.filter(
+            Q(name__icontains=query)
+        )
+        return qs

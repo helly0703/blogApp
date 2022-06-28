@@ -38,3 +38,9 @@ class AccountUpdateForm(forms.ModelForm):
             'birthday': DateInput(),
         }
 
+
+class AccountSettingsForm(forms.ModelForm):
+
+    class Meta:
+        model = Account
+        fields = ['privacy_mode','allow_notification']

@@ -9,7 +9,7 @@
           <div class="user-block">
             <img class="rounded-circle" src="{{ post.author.account.image.url }}" alt="User Image" height="50px"
                  width="50px">
-            <span class="username" style="font-size:20px"><a href="#">{{ post.author }}</a></span>
+            <span class="username" style="font-size:20px"><a href="{% url 'friend_detail' post.author.account.id %}">{{ post.author }}</a></span>
             <span class="description">Posted on {{ post.date_posted }}</span>
           </div>
         </div>
@@ -49,6 +49,7 @@
               <img class="rounded-circle" src="{{ post.author.account.image.url }}" height="20px"
                  width="20px"
                  alt="{{ post.author }}">
+              {{ post.author }}
               <input type="hidden" name="post_id" value="{{object.id}}">
               <input type="text" placeholder="Press enter to post comment"
                      name="comment">
@@ -66,7 +67,7 @@
                  width="20px">
             </span>
             <span class="username">
-            {{ comment.name }}
+            {{ comment.user.user.account.name }}
             <span class="text-muted pull-right">{{ comment.created }}</span>
             </span>
             <span class="text-muted" style="padding-left:5px">{{ comment.body }}</span>

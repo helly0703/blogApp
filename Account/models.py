@@ -5,6 +5,7 @@ from datetime import date
 from django.db.models import Q
 
 
+
 class AccountManager(models.Manager):
 
     def get_all_profiles_to_invites(self, sender):
@@ -46,8 +47,9 @@ class Account(models.Model):
                               max_length=6,
                               choices=[('MALE', 'MALE'), ('FEMALE', 'FEMALE')]
                               )
-    privacy_mode = models.CharField(null=True, max_length=7, choices=[('PUBLIC', 'PUBLIC'), ('PRIVATE', 'PRIVATE')])
-    allow_notification = models.BooleanField(null=True)
+    privacy_mode = models.CharField(null=True, max_length=7, choices=[('PUBLIC', 'PUBLIC'), ('PRIVATE', 'PRIVATE')],
+                                    editable=True)
+    allow_notification = models.BooleanField(null=True, editable=True)
     description = models.CharField(default=' ', null=True, max_length=50)
     friendslist = models.ManyToManyField(User, related_name='friendslist', null=True, default=None)
 
@@ -71,6 +73,7 @@ class Account(models.Model):
 
     def get_friends_no(self):
         return self.friendslist.all().count()
+
 
     # def get_all_authors_posts(self):
     #     return self.posts.all()

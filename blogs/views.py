@@ -4,7 +4,7 @@ from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
 
 from Account.models import Account
-from .models import Post, Like, Comment
+from .models import Post, Like, Comment, SavePost
 from django.http import HttpResponseRedirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
@@ -108,6 +108,47 @@ class PostCommentListView(LoginRequiredMixin,ListView):
         print(pk)
         queryset = super().get_queryset()
         return queryset.filter(post_id=pk)
+
+
+class SavedPostListView(LoginRequiredMixin, ListView):
+    model = Post
+    template_name = 'blogs/saved_blogs.html'
+    context_object_name = 'qs'
+
+    def get_queryset(self, **kwargs):
+        saved = SavePost.objects.filter(user=self.request.user.account)
+        print(saved)
+        qs = []
+        for item in saved:
+            qs.append(Post.objects.get(title=item.post))
+        print(qs)
+        return qs
+
+
+class PostSaveView(LoginRequiredMixin,View):
+    def post(self,request,*args,**kwargs):
+        user = self.request.user
+        print(user)
+        if request.method == 'POST':
+            post_id = request.POST.get('post_id')
+            post_obj = Post.objects.get(id=post_id)
+            profile = Account.objects.get(user=user)
+            if profile in post_obj.saved.all():
+                post_obj.saved.remove(profile)
+            else:
+                post_obj.saved.add(profile)
+
+            saved, created = SavePost.objects.get_or_create(user=profile, post=post_obj)
+
+            if not created:
+                if saved.value == 'Save':
+                    saved.value = 'Unsave'
+                else:
+                    saved.value = 'Save'
+
+        post_obj.save()
+        saved.save()
+        return redirect(request.META.get('HTTP_REFERER'))
 
 
 

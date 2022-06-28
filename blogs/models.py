@@ -15,6 +15,7 @@ class Post(models.Model):
     # category_id = models.ForeignKey(PostCategory, on_delete=models.SET_DEFAULT(None))
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     liked = models.ManyToManyField(Account, blank=True, related_name='likes')
+    saved = models.ManyToManyField(Account, blank=True, related_name='saved')
 
     def __str__(self):
         return self.title
@@ -30,8 +31,14 @@ class Post(models.Model):
         commment_list = Comment.objects.all().filter(post=self)[:5]
         return commment_list
 
+
     def get_absolute_url(self):
         return reverse('post-detail', kwargs={'pk': self.pk})
+
+    # def saved_posts(self,request):
+    #     post_list = SavePost.objects.filter(post=self,user=self.request.user,value='Save')
+    #     print(post_list)
+    #     return post_list
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -77,3 +84,24 @@ class Like(models.Model):
 
     def __str__(self):
         return f"{self.user}-{self.post}-{self.value}"
+
+
+SAVE_CHOICES = (
+    ('Save', 'Save'),
+    ('Unsave', 'Unsave')
+)
+
+
+class SavePost(models.Model):
+    user = models.ForeignKey(Account, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    value = models.CharField(choices=SAVE_CHOICES, max_length=8)
+
+    def __str__(self):
+        return f"{self.user}-{self.post}-{self.value}"
+
+
+
+
+
+

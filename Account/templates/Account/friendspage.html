@@ -2,24 +2,20 @@
 {% load static %}
 {% block content %}
 {% load crispy_forms_tags %}
-    <form class="search-bar justify-content-start">
-			<input type="text" class="form-control" name="q" id="id_q_large" placeholder="Search...">
-    </form>
     {% if user.is_authenticated %}
         <div class="container">
             {% for object in user.account.get_friends %}
                 <div class="row">
                   <div class="col-md-2 col-sm-2">
-                    <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="user" height="50px"
-                         width="50px">
+                    <img src="{{ object.account.image.url }}" alt="user" height="50px"
+                         width="50px" style="border-radius:50%; padding:5px">
                   </div>
                   <div class="col-md-7 col-sm-7">
                     <h5><a href="{% url 'friend_detail' object.account.id %}" class="profile-link">{{ object.username }}</a>
-                        {{object.id}}
+
                     </h5>
                   </div>
                   <div class="col-md-3 col-sm-3">
-<!--                    <button class="btn btn-primary pull-right">Remove Friend</button>-->
                       <form action="{%url 'removefriend' %}" method="post">
                           {% csrf_token%}
                             <input type="hidden" name="profile_pk" value="{{ object.account.id }}">
@@ -32,5 +28,4 @@
     {% else %}
         <small class="text-muted"><a href="{% url 'login' %}" class="ml-2">Login</a></small>
     {% endif %}
-
 {% endblock content %}

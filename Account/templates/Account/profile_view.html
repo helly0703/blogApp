@@ -1,5 +1,8 @@
 {% extends 'Account/home_base.html' %}
 {% load static %}
+{%block title%}
+Profile
+{%endblock title%}
 {% block content %}
 {% load crispy_forms_tags %}
 
@@ -50,6 +53,10 @@
                                 <td>Description</td>
                                 <td>{{user.account.description}}</td>
                             </tr>
+                            <tr>
+                                <td>My Friends</td>
+                                <td>{{user.account.friendslist.count}}</td>
+                            </tr>
                         </table>
                     </div>
                 </div>
@@ -62,7 +69,10 @@
                             <a type="button" class="btn btn-secondary" href="{% url 'friendspage' %}">View Friends</a>
                         </td>
                         <td>
-                            <a type="button" class="btn btn-secondary" href="#">Settings</a>
+                            <a type="button" class="btn btn-secondary" href="{% url 'post-saved' %}">Saved Posts</a>
+                        </td>
+                        <td>
+                            <a type="button" class="btn btn-secondary" href="{% url 'settings' %}">Settings</a>
                         </td>
                     </tr>
                 </table>

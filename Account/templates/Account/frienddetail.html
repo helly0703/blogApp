@@ -51,8 +51,13 @@
                                 </tr>
                             </table>
                         </div>
+
                     </div>
-                    <a type="button" class="btn btn-secondary" href="#">Remove Friend</a>
+                    <form action="{%url 'removefriend' %}" method="post">
+                      {% csrf_token%}
+                        <input type="hidden" name="profile_pk" value="{{ object.account.id }}">
+                        <button class="btn btn-primary pull-right">Remove from friends</button>
+                    </form>
                 </div>
             </div>
         </div>
