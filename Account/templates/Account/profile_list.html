@@ -2,10 +2,12 @@
 {% load static %}
 {% block content %}
 {% load crispy_forms_tags %}
-    <form class="search-bar justify-content-start">
-			<input type="text" class="form-control" name="q" id="id_q_large" placeholder="Search...">
+    <form class="search-bar justify-content-start" action="{% url 'search-profile' %}" name="search-profile"
+          id="search-profile" method="get">
+			<input type="text" class="form-control" name="search_field" id="search_field" placeholder="Search...">
     </form>
     {% if user.is_authenticated %}
+
         <div class="container">
             {% for object in qs %}
                 <div class="row" style="padding-bottom:2px">
@@ -42,7 +44,6 @@
                 </div>
             <hr>
             {% endfor%}
-            <input name="user-input" id="user-input" placeholder="Search">
 
             <div id="replaceable-content" class="col-6">
             </div>
@@ -52,4 +53,14 @@
     {% endif %}
 
 {% endblock content %}
+
+{% block script%}
+
+$(document).ready(function(){
+$('#search_field').keyup(function(){
+  $('#search-profile').submit();
+});
+};
+
+{% endblock script%}
 

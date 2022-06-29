@@ -12,6 +12,7 @@ from django.contrib.auth.models import User
 
 # Create your views here.
 class HomeView(LoginRequiredMixin,ListView):
+    # paginate_by = 2
     model = Post
     template_name = 'blogs/feed.html'
 

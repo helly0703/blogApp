@@ -16,6 +16,8 @@ from Account.views import (
     RejectInvitesView,
     SearchProfileView,
     SettingsFormView,
+    BlockUserCreateView,
+    MyBlogsView,
 )
 from notifications.views import NotificationsListView
 
@@ -28,16 +30,18 @@ urlpatterns = [
     path('home/friends/', FriendView.as_view(), name='friendspage'),
     path('home/friends/<int:pk>/', FriendDetailView.as_view(), name='friend_detail'),
     path('home/friends/<int:pk>/add', ViewFriendDetailView.as_view(), name='friend_request'),
-    path('home/myinvites', InvitesReceivedView.as_view(), name='myinvites'),
-    path('home/allprofiles', ProfileListView.as_view(), name='allprofiles'),
+    path('home/my-invites', InvitesReceivedView.as_view(), name='myinvites'),
+    path('home/all-profiles', ProfileListView.as_view(), name='allprofiles'),
     path('home/search-profile', SearchProfileView.as_view(), name='search-profile'),
+    path('home/block-profile', BlockUserCreateView.as_view(), name='block-profile'),
+    path('home/invite-profiles', InvitesProfileListView.as_view(), name='inviteprofiles'),
+    path('home/send-invite', SendInviteView.as_view(), name='sendinvite'),
+    path('home/remove-friend', RemoveFriendView.as_view(), name='removefriend'),
+    path('home/my-blogs', MyBlogsView.as_view(), name='my-blogs'),
 
-    path('home/inviteprofiles', InvitesProfileListView.as_view(), name='inviteprofiles'),
-    path('home/sendinvite', SendInviteView.as_view(), name='sendinvite'),
-    path('home/removefriend', RemoveFriendView.as_view(), name='removefriend'),
 
-    path('home/acceptrequest', AcceptInvitesView.as_view(), name='acceptrequest'),
-    path('home/removerequest', RejectInvitesView.as_view(), name='removerequest'),
+    path('home/accept-request', AcceptInvitesView.as_view(), name='acceptrequest'),
+    path('home/remove-request', RejectInvitesView.as_view(), name='remove_request'),
     path('home/notifications', NotificationsListView.as_view(), name='notifications'),
     path('accounts/login/', auth_views.LoginView.as_view(template_name='Account/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name='Account/logout.html'), name='logout'),

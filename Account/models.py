@@ -12,11 +12,9 @@ class AccountManager(models.Manager):
         profiles = Account.objects.all().exclude(user=sender)
         print(profiles)
         profile = Account.objects.get(user=sender)
-        print(profile)
         qs = Relationship.objects.filter(Q(sender=profile) | Q(receiver=profile))
 
         accepted = []
-        pending = []
         for rel in qs:
             if rel.status == 'accepted':
                 accepted.append(rel.receiver)
@@ -50,8 +48,10 @@ class Account(models.Model):
     privacy_mode = models.CharField(null=True, max_length=7, choices=[('PUBLIC', 'PUBLIC'), ('PRIVATE', 'PRIVATE')],
                                     editable=True)
     allow_notification = models.BooleanField(null=True, editable=True)
-    description = models.CharField(default=' ', null=True, max_length=50)
-    friendslist = models.ManyToManyField(User, related_name='friendslist', null=True, default=None)
+    description = models.CharField(default='',blank=True, null=True, max_length=50)
+    friendslist = models.ManyToManyField(User, related_name='friendslist', null=True, default=None, blank=True)
+    blockedlist = models.ManyToManyField(User, related_name='blocklist', null=True, default=None, blank=True)
+
 
     objects = AccountManager()
 
@@ -74,9 +74,42 @@ class Account(models.Model):
     def get_friends_no(self):
         return self.friendslist.all().count()
 
+    def get_blocklist(self):
+        print(self.blockedlist.all())
+        return self.blockedlist.all()
 
-    # def get_all_authors_posts(self):
-    #     return self.posts.all()
+    def get_user(self):
+        user = User.objects.get(pk=self.user_id)
+        print(user)
+        return user
+
+    def request_exist(self):
+        rel = Relationship.objects.filter(sender=self)
+        if rel:
+            return rel
+        else:
+            rel = Relationship.objects.filter(receiver=self)
+            return rel
+
+    def get_all_authors_posts(self):
+        user = self.get_user()
+        from blogs.models import Post
+        posts = Post.objects.filter(author=user)
+        return posts
+
+    def check_send_request(self):
+        qs = Relationship.objects.filter(sender=self,status='send')
+        receivers = []
+        for obj in qs:
+            receivers.append(obj.receiver)
+        return receivers
+
+    def check_received_request(self):
+        qs = Relationship.objects.filter(receiver=self,status='send')
+        senders = []
+        for obj in qs:
+            senders.append(obj.sender)
+        return senders
 
 
 STATUS_CHOICES = (
@@ -97,6 +130,8 @@ class Relationship(models.Model):
     status = models.CharField(max_length=8, choices=STATUS_CHOICES)
 
     objects = RelationshipManager()
+
+
 
     def __str__(self):
         return f'{self.sender}'

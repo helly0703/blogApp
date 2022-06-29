@@ -1,81 +1,83 @@
 {% extends 'blogs/base.html' %}
 {% load static %}
-
+{%block title%}{{post.title}}{%endblock title%}
 {% block content %}
-<div class="container bootstrap snippets bootdey">
-    <div class="col-md-8">
-      <div class="box box-widget">
-        <div class="box-header with-border">
-          <div class="user-block">
-            <img class="rounded-circle" src="{{ post.author.account.image.url }}" alt="User Image" height="50px"
-                 width="50px">
-            <span class="username" style="font-size:20px"><a href="{% url 'friend_detail' post.author.account.id %}">{{ post.author }}</a></span>
-            <span class="description">Posted on {{ post.date_posted }}</span>
-          </div>
-        </div>
-
-        <div class="box-body" style="display: block;">
-          <h3>{{ post.title }}</h3>
-          <img class="img-responsive pad" src="{{ post.image.url }}" alt="Photo">
-          <p>{{ post.content }}</p>
-
-<!--          <button type="button" class="btn btn-default btn-xs"><i class="fa fa-share"></i> Share</button>-->
-          <form action="{% url 'post-like' object.id%}" method="post">
-            {% csrf_token%}
-            <input type="hidden" name="post_id" value="{{object.id}}">
-            {% if user.account in object.liked.all %}
-              <button type="submit" class="btn btn-secondary btn-xs"><i class="fa fa-thumbs-o-up"></i> UnLike</button>
-            {% else %}
-              <button type="submit" class="btn btn-default btn-xs"><i class="fa fa-thumbs-o-up"></i> Like</button>
-            {% endif %}
-          </form>
-
-          {% if object.author == user %}
-            <a href="{% url 'post-update' object.id %}" class="btn btn-outline-secondary">Update</a>
-            <a href="{% url 'post-delete' object.id %}" class="btn btn-outline-secondary">Delete</a>
-          {% endif %}
-          <a href="{% url 'blogs' %}" class="btn btn-outline-secondary">Back</a>
-
-          <span class="pull-right text-muted">{{ post.num_of_likes }} likes - {{ post.num_of_comments }}
-            comments</span>
-        </div>
-
-<!-- Comments section-->
-        <h3>Comments</h3>
-        <div class="box-footer" style="display: block; background-color:#f7f7f7">
-          <form action="{% url 'post-comment' object.id%}" method="post">
-            <div class="img-push">
-              {% csrf_token%}
-              <img class="rounded-circle" src="{{ post.author.account.image.url }}" height="20px"
-                 width="20px"
-                 alt="{{ post.author }}">
-              {{ post.author }}
-              <input type="hidden" name="post_id" value="{{object.id}}">
-              <input type="text" placeholder="Press enter to post comment"
-                     name="comment">
-              <button type="submit">Comment</button>
-
+<!--  <a href="javascript:history.go(-1)" class="btn btn-outline-secondary">Back</a>-->
+  <div class="container bootstrap snippets bootdey">
+      <div class="col-md-8">
+        <div class="box box-widget">
+          <div class="box-header with-border">
+            <div class="user-block">
+              <img class="rounded-circle" src="{{ post.author.account.image.url }}" alt="User Image" height="50px"
+                   width="50px">
+              <span class="username" style="font-size:20px"><a href="{% url 'friend_detail' post.author.account.id %}">{{ post.author }}</a></span>
+              <span class="description">Posted on {{ post.date_posted }}</span>
             </div>
-          </form>
-        </div>
-        <div class="box-footer box-comments" style="display: block; background-color:#f7f7f7;">
-          {% for comment in post.get_comments%}
-          <div class="box-comment" style="padding-top:3px">
-            <span>
-              <img class="rounded-circle" src="{{ comment.user.user.account.image.url }}" alt="User Image"
-                    height="20px"
-                 width="20px">
-            </span>
-            <span class="username">
-            {{ comment.user.user.account.name }}
-            <span class="text-muted pull-right">{{ comment.created }}</span>
-            </span>
-            <span class="text-muted" style="padding-left:5px">{{ comment.body }}</span>
-            </span>
           </div>
-          {% endfor %}
+
+          <div class="box-body" style="display: block;">
+            <h3>{{ post.title }}</h3>
+            <img class="img-responsive pad" src="{{ post.image.url }}" alt="Photo">
+            <p>{{ post.content }}</p>
+
+  <!--          <button type="button" class="btn btn-default btn-xs"><i class="fa fa-share"></i> Share</button>-->
+            <form action="{% url 'post-like' object.id%}" method="post">
+              {% csrf_token%}
+              <input type="hidden" name="post_id" value="{{object.id}}">
+              {% if user.account in object.liked.all %}
+                <button type="submit" class="btn btn-secondary btn-xs search_field" id="search_field"><i class="fa fa-thumbs-o-up"></i>
+                  UnLike</button>
+              {% else %}
+                <button type="submit" class="btn btn-default btn-xs"><i class="fa fa-thumbs-o-up"></i> Like</button>
+              {% endif %}
+            </form>
+
+            {% if object.author == user %}
+              <a href="{% url 'post-update' object.id %}" class="btn btn-outline-secondary">Update</a>
+              <a href="{% url 'post-delete' object.id %}" class="btn btn-outline-secondary">Delete</a>
+            {% endif %}
+            <a href="{% url 'blogs'%}" class="btn btn-outline-secondary">View all blogs</a>
+
+            <span class="pull-right text-muted">{{ post.num_of_likes }} likes - {{ post.num_of_comments }}
+              comments</span>
+          </div>
+
+  <!-- Comments section-->
+          <h3>Comments</h3>
+          <div class="box-footer" style="display: block; background-color:#f7f7f7">
+            <form action="{% url 'post-comment' object.id%}" method="post">
+              <div class="img-push">
+                {% csrf_token%}
+                <img class="rounded-circle" src="{{ post.author.account.image.url }}" height="20px"
+                   width="20px"
+                   alt="{{ post.author }}">
+                {{ post.author }}
+                <input type="hidden" name="post_id" value="{{object.id}}">
+                <input type="text" placeholder="Press enter to post comment"
+                       name="comment">
+                <button type="submit">Comment</button>
+
+              </div>
+            </form>
+          </div>
+          <div class="box-footer box-comments" style="display: block; background-color:#f7f7f7;">
+            {% for comment in post.get_comments%}
+            <div class="box-comment" style="padding-top:3px">
+              <span>
+                <img class="rounded-circle" src="{{ comment.user.user.account.image.url }}" alt="User Image"
+                      height="20px"
+                   width="20px">
+              </span>
+              <span class="username">
+              {{ comment.user.user.account.name }}
+              <span class="text-muted pull-right">{{ comment.created }}</span>
+              </span>
+              <span class="text-muted" style="padding-left:5px">{{ comment.body }}</span>
+              </span>
+            </div>
+            {% endfor %}
+          </div>
         </div>
       </div>
-    </div>
-</div>
+  </div>
 {% endblock content %}

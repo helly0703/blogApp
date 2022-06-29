@@ -6,12 +6,14 @@ Add Friends
 {% block content %}
 {% load crispy_forms_tags %}
     {% if user.is_authenticated %}
+        <a href="javascript:history.go(-1)" class="btn btn-outline-secondary">Back</a>
         <div class="container">
             <form action="{% url 'search-profile' %}" name="search-profile" id="search-profile" method="get">
                 {% csrf_token%}
                 <input type="text" id="search_field" name="search_field">
             </form>
             {% for object in qs %}
+            {% if not user in object.user.account.blockedlist.all %}
                 <div class="row" style="padding-bottom:2px">
                   <div class="col-md-2 col-sm-2">
                     <img src="{{ object.image.url }}" alt="user" height="50px"
@@ -26,13 +28,50 @@ Add Friends
                        <form action="{% url 'sendinvite' %}" method="post" >
                         {% csrf_token%}
                           <input type="hidden" name="profile_pk" value="{{ object.id }}" >
+                        {% if object.user not in user.account.blockedlist.all%}
+<!--                          <button type="submit" class="btn btn-primary ">Add Friend</button>-->
+                           {%if object in user.account.check_received_request%}
 
-                          <button type="submit" class="btn btn-primary ">Add Friend</button>
+                        <form action="{% url 'acceptrequest' %}" method="post">
+                            {% csrf_token%}
+                            <input type="hidden" name="profile_pk" value="{{ object.id}}">
+                            <button type="submit" class="btn btn-primary pull-right">Accept Friend Request</button>
+                        </form>
+
+                        <form action="{% url 'remove_request' %}" method="post">
+                            {% csrf_token%}
+                            <input type="hidden" name="profile_pk" value="{{ object.id }}">
+                            <button type="submit" class="btn btn-primary pull-right">Remove from Friend Request</button>
+                        </form>
+
+                    {%elif object in user.account.check_send_request%}
+                        <button class="btn btn-primary pull-right" disabled>Waiting for response</button>
+
+                    {% elif object.get_user not in user.account.friendslist.all %}
+                        <form action="{%url 'sendinvite' %}" method="post">
+                            {% csrf_token%}
+                            <input type="hidden" name="profile_pk" value="{{ object.id }}">
+                            <button class="btn btn-primary pull-right">Add friend</button>
+                        </form>
+
+                    {% else%}
+
+                    <form action="{%url 'removefriend' %}" method="post">
+                        {% csrf_token%}
+                        <input type="hidden" name="profile_pk" value="{{ object.id }}">
+                        <button class="btn btn-primary pull-right">Remove from friends</button>
+                    </form>
+
+                    {% endif %}
+
+                        {% else%}
+                          <button type="submit" class="btn btn-primary ">Unblock and Add friend</button>
+                        {% endif %}
                       </form>
 
                   </div>
                 </div>
-
+            {% endif%}
             {% endfor%}
         </div>
     {% else %}
