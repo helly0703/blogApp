@@ -12,13 +12,13 @@
     </div>
 </div>
 <br>
-{% for post in object_list %}
-{% if post.author in user.account.friendslist.all or post.author == user %}
+{% for post in qs %}
     <div class="card gedf-card">
         <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="mr-2">
+
                         <img class="rounded-circle" width="45" src="{{ post.author.account.image.url }}" alt="">
                     </div>
                     <div class="ml-2">
@@ -49,9 +49,11 @@
         <div class="card-body">
             <div class="text-muted h7 mb-2"> <i class="fa fa-clock-o"></i>{{ post.date_posted  }}</div>
             <a class="card-link" href="{% url 'blog-post' post.id %}">
-                <h2 class="card-title">{{ post.title }}</h2>
-            </a>
-            <img height="500px" width="700px" src="{{ post.image.url }}" alt="">
+                <h2 class="card-title">{{ post.title }}</h2></a>
+            {%if post.image.url != None%}
+                <img class="img-fluid" height="" width="" src="{{ post.image.url }}" alt="">
+            {%endif%}
+
 
             <p style="font-size:20px">
                 {{ post.content|truncatewords:60  }}
@@ -64,7 +66,24 @@
             </a>
         </div>
     </div>
-{% endif %}
 {% endfor %}
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+
 
 {% endblock content %}

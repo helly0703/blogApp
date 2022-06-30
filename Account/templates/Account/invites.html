@@ -1,5 +1,7 @@
 {% extends 'Account/home_base.html' %}
 {% load static %}
+{%block title%}Requests{%endblock title%}
+
 {% block content %}
 {% load crispy_forms_tags %}
     {% if user.is_authenticated %}
@@ -15,7 +17,7 @@
                     <h5><a href="{% url 'friend_detail' object.sender.id %}" class="profile-link">{{ object }}</a></h5>
                   </div>
                   <div class="col-md-3 col-sm-3">
-                      <form action="{% url 'acceptrequest' %}" method="post">
+                      <form action="{% url 'accept_request' %}" method="post">
                         {% csrf_token%}
                         <input type="hidden" name="profile_pk" value="{{ object.sender.id }}">
                         <button type="submit" class="btn btn-primary pull-right">Accept Friend Request</button>

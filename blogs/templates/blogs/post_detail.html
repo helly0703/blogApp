@@ -17,7 +17,10 @@
 
           <div class="box-body" style="display: block;">
             <h3>{{ post.title }}</h3>
-            <img class="img-responsive pad" src="{{ post.image.url }}" alt="Photo">
+            {%if post.image.url != None%}
+                <img class="img-responsive pad" src="{{ post.image.url }}" alt="Photo">
+
+            {%endif%}
             <p>{{ post.content }}</p>
 
   <!--          <button type="button" class="btn btn-default btn-xs"><i class="fa fa-share"></i> Share</button>-->

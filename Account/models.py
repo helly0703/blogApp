@@ -43,11 +43,11 @@ class Account(models.Model):
     birthday = models.DateField(null=True, default=date(2022, 3, 12))
     gender = models.CharField(null=True,
                               max_length=6,
-                              choices=[('MALE', 'MALE'), ('FEMALE', 'FEMALE')]
+                              choices=[('MALE', 'MALE'), ('FEMALE', 'FEMALE')],
                               )
     privacy_mode = models.CharField(null=True, max_length=7, choices=[('PUBLIC', 'PUBLIC'), ('PRIVATE', 'PRIVATE')],
-                                    editable=True)
-    allow_notification = models.BooleanField(null=True, editable=True)
+                                    editable=True,default='PRIVATE')
+    allow_notification = models.BooleanField(null=True, editable=True,default=True)
     description = models.CharField(default='',blank=True, null=True, max_length=50)
     friendslist = models.ManyToManyField(User, related_name='friendslist', null=True, default=None, blank=True)
     blockedlist = models.ManyToManyField(User, related_name='blocklist', null=True, default=None, blank=True)

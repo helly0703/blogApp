@@ -200,7 +200,7 @@ class SendInviteView(LoginRequiredMixin, View):
                     sender.blockedlist.remove(block_user)
                 Relationship.objects.create(sender=sender, receiver=receiver, status='send')
 
-        return redirect('inviteprofiles')
+        return redirect('invite_profiles')
 
 
 class RemoveFriendView(LoginRequiredMixin, View):
@@ -262,14 +262,15 @@ class BlockUserCreateView(LoginRequiredMixin,View):
 
 
 class MyBlogsView(LoginRequiredMixin, ListView):
+    paginate_by = 5
     model = Post
     template_name = 'blogs/feed.html'
-    context_object_name = 'object_list'
+    context_object_name = 'qs'
 
     def get_queryset(self):
         user = self.request.user
 
-        object_list = Post.objects.filter(author=user)
-        return object_list
+        qs = Post.objects.filter(author=user)
+        return qs
 
 
