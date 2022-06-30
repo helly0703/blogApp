@@ -1,11 +1,8 @@
-from itertools import chain
-
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView, DetailView, CreateView, FormView
+from django.views.generic import ListView, DetailView, CreateView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -182,15 +179,12 @@ class SendInviteView(LoginRequiredMixin, View):
     def post(self, request):
         if self.request.method == 'POST':
             pk = self.request.POST.get('profile_pk')
-            # print(pk)
-            # print("block_user",block_user)
+
             user = self.request.user
             sender = Account.objects.get(user=user)
             receiver = Account.objects.get(pk=pk)
             block_user = User.objects.get(pk=receiver.user_id)
-            # print(block_user)
 
-            # print(receiver.privacy_mode)
             if receiver.privacy_mode == 'PUBLIC':
                 if block_user in sender.blockedlist.all():
                     sender.blockedlist.remove(block_user)
@@ -239,7 +233,6 @@ class SearchProfileView(ListView):
         return set(qs)
 
 
-
 class BlockUserCreateView(LoginRequiredMixin,View):
     def post(self, request):
         if self.request.method == 'POST':
@@ -258,7 +251,6 @@ class BlockUserCreateView(LoginRequiredMixin,View):
                     rel = get_object_or_404(Relationship, sender=block_user.account, receiver=blocked_by)
                     rel.delete()
             return redirect(request.META.get('HTTP_REFERER'))
-
 
 
 class MyBlogsView(LoginRequiredMixin, ListView):

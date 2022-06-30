@@ -17,12 +17,12 @@
                     </h5>
                   </div>
                   <div class="col-md-3 col-sm-3">
-                      <form action="{%url 'removefriend' %}" method="post">
+                      <form action="{%url 'remove_friend' %}" method="post">
                           {% csrf_token%}
                             <input type="hidden" name="profile_pk" value="{{ object.account.id }}">
                             <button class="btn btn-primary pull-right">Remove from friends</button>
                         </form>
-                      <form action="{%url 'block-profile' %}" method="post">
+                      <form action="{%url 'block_profile' %}" method="post">
                           {% csrf_token%}
                             <input type="hidden" name="profile_pk" value="{{ object.id }}">
                             <button class="btn btn-primary pull-right">Block friends</button>

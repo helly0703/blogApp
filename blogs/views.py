@@ -1,35 +1,49 @@
-from django.shortcuts import render, redirect
+from django.db.models import Q
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
-
+from django.views.generic import (
+    ListView,
+    DetailView,
+    CreateView,
+    UpdateView,
+    DeleteView
+)
 from Account.models import Account
+from .forms import BlogCreateForm
 from .models import Post, Like, Comment, SavePost
-from django.http import HttpResponseRedirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.models import User
 
 
 # Create your views here.
-class HomeView(LoginRequiredMixin,ListView):
-    # paginate_by = 2
+class HomeView(LoginRequiredMixin, ListView):
+    paginate_by = 5
     model = Post
     template_name = 'blogs/feed.html'
+    context_object_name = 'qs'
+
+    #  getting personal and friends posts
+    def get_queryset(self, **kwargs):
+        qs = Post.objects.filter(
+            Q(author__in=self.request.user.account.friendslist.all()) | Q(author=self.request.user)).order_by(
+            '-date_posted')
+        return qs
 
 
-class PostDetailView(LoginRequiredMixin,DetailView):
+class PostDetailView(LoginRequiredMixin, DetailView):
     model = Post
     template_name = 'blogs/post_detail.html'
 
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
-    fields = ['title', 'content', 'image']
+    form_class = BlogCreateForm
     success_url = reverse_lazy('blogs')
 
     def form_valid(self, form):
+        print(f"FORM {form.data}")
         form.instance.author = self.request.user
-        return super().form_valid(form)
+        return super(PostCreateView, self).form_valid(form)
 
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -61,8 +75,8 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             return False
 
 
-class PostLikeView(LoginRequiredMixin,View):
-    def post(self,request,*args,**kwargs):
+class PostLikeView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
         user = self.request.user
         pk = kwargs['pk']
         if request.method == 'POST':
@@ -87,24 +101,24 @@ class PostLikeView(LoginRequiredMixin,View):
         return redirect('blog-post', pk=pk)
 
 
-class PostCommentCreateView(LoginRequiredMixin,View):
+class PostCommentCreateView(LoginRequiredMixin, View):
 
-    def post(self,request,*args,**kwargs):
+    def post(self, request, *args, **kwargs):
         pk = kwargs['pk']
         user = self.request.user
         if request.method == 'POST':
             post_id = request.POST.get('post_id')
             comment = request.POST.getlist("comment")
             profile = Account.objects.get(user=user)
-            Comment.objects.get_or_create(user=profile, post_id=post_id,body =comment[0])
+            Comment.objects.get_or_create(user=profile, post_id=post_id, body=comment[0])
         return redirect('blog-post', pk=pk)
 
 
-class PostCommentListView(LoginRequiredMixin,ListView):
+class PostCommentListView(LoginRequiredMixin, ListView):
     model = Comment
     template_name = 'blogs/feed.html'
 
-    def get_queryset(self,**kwargs):
+    def get_queryset(self, **kwargs):
         pk = kwargs['pk']
         print(pk)
         queryset = super().get_queryset()
@@ -112,22 +126,25 @@ class PostCommentListView(LoginRequiredMixin,ListView):
 
 
 class SavedPostListView(LoginRequiredMixin, ListView):
+    paginate_by = 5
     model = Post
     template_name = 'blogs/saved_blogs.html'
     context_object_name = 'qs'
 
     def get_queryset(self, **kwargs):
-        saved = SavePost.objects.filter(user=self.request.user.account)
+        saved = SavePost.objects.filter(user=self.request.user.account, value='Save')
         print(saved)
         qs = []
         for item in saved:
-            qs.append(Post.objects.get(title=item.post))
+            if item.post.author in self.request.user.account.friendslist.all() or item.post.author == self.request.user:
+                qs.append(Post.objects.get(title=item.post))
         print(qs)
+
         return qs
 
 
-class PostSaveView(LoginRequiredMixin,View):
-    def post(self,request,*args,**kwargs):
+class PostSaveView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
         user = self.request.user
         print(user)
         if request.method == 'POST':
@@ -139,17 +156,16 @@ class PostSaveView(LoginRequiredMixin,View):
             else:
                 post_obj.saved.add(profile)
 
-            saved, created = SavePost.objects.get_or_create(user=profile, post=post_obj)
-
+            saved, created = SavePost.objects.get_or_create(user=profile, post=post_obj, value='Save')
+            print(saved.value)
             if not created:
                 if saved.value == 'Save':
                     saved.value = 'Unsave'
                 else:
                     saved.value = 'Save'
 
+            print(saved.value)
+
         post_obj.save()
         saved.save()
         return redirect(request.META.get('HTTP_REFERER'))
-
-
-
