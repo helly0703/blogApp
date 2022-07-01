@@ -12,7 +12,7 @@ class Post(models.Model):
     content = models.TextField()
     image = models.ImageField(null=True, default=None, blank=True, upload_to='blog_pics/')
     date_posted = models.DateTimeField(default=timezone.now)
-    category = models.CharField(max_length=255)
+    category = models.CharField(blank=True, default='Uncategorized',max_length=255)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     liked = models.ManyToManyField(Account, blank=True, related_name='likes')
     saved = models.ManyToManyField(Account, blank=True, related_name='saved')

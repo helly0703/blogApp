@@ -35,6 +35,8 @@ INSTALLED_APPS = [
     'blogs',
     'notifications',
     'crispy_forms',
+    'chat',
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -71,8 +73,19 @@ TEMPLATES = [
         },
     },
 ]
+# Channels
+ASGI_APPLICATION = 'BlogApp.asgi.application'
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
+
 
 WSGI_APPLICATION = 'BlogApp.wsgi.application'
+
+
+
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases

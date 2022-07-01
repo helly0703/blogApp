@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.dispatch import receiver
 from .models import Account, Relationship
 from notifications.models import Notifications
+from django.utils.crypto import get_random_string
+from chat.models import Room
 
 
 # To create account instance
@@ -24,6 +26,11 @@ def post_save_add_to_friends(sender, instance, created, **kwargs):
     sender_ = instance.sender
     receiver_ = instance.receiver
     if instance.status == 'accepted':
+        unique_id = get_random_string(length=32)
+        room1 = Room.objects.filter(user1=sender_.user,user2=receiver_.user)
+        room2 = Room.objects.filter(user2=sender_.user,user1=receiver_.user)
+        if not room1 and not room2:
+            Room.objects.create(name=unique_id,user1=sender_.user,user2=receiver_.user)
         sender_.friendslist.add(receiver_.user)
         receiver_.friendslist.add(sender_.user)
         sender_message = f'You and {receiver_.user.account} are now friends'

@@ -11,7 +11,7 @@ from django.views.generic import (
 )
 from Account.models import Account
 from .forms import BlogCreateForm
-from .models import Post, Like, Comment, SavePost
+from .models import Post, Like, Comment, SavePost, Category
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 
@@ -169,3 +169,30 @@ class PostSaveView(LoginRequiredMixin, View):
         post_obj.save()
         saved.save()
         return redirect(request.META.get('HTTP_REFERER'))
+
+
+class PostFilterView(LoginRequiredMixin, ListView):
+    model = Post
+    template_name = "blogs/feed.html"
+    context_object_name = 'qs'
+
+    def get_queryset(self):
+        query = self.request.GET.get("category-id")
+        print(query)
+        posts = Post.objects.filter(category=query)
+        qs=[]
+        for item in posts:
+            if item.author in self.request.user.account.friendslist.all() or item.author == self.request.user:
+                qs.append(Post.objects.get(title=item))
+        return qs
+
+
+class CategoryListView(LoginRequiredMixin, ListView):
+    model = Category
+    template_name = "blogs/filter.html"
+    context_object_name = 'qs'
+
+    def get_queryset(self):
+        qs = Category.objects.filter()
+        return qs
+

@@ -1,7 +1,9 @@
 {% extends 'blogs/base.html' %}
 {%block title%}Posts{%endblock title%}
+
 {% block content %}
 
+<a class="nav-link active"  href="{% url 'filter-blog' %}" onclick="">Filter Blogs</a>
 <div class="card gedf-card">
     <div class="card-header">
         <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
@@ -87,3 +89,7 @@
 
 
 {% endblock content %}
+
+{% block script%}
+{%endblock script%}
+

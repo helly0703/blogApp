@@ -1,0 +1,19 @@
+{% extends 'blogs/base.html' %}
+{%block title%}Posts{%endblock title%}
+
+{% block content %}
+    <form action="{% url 'category-list'%}" name="filter-blog" id="filter-blog" method="GET">
+        {% csrf_token%}
+        <select id="category-id" name="category-id">
+        {% for category in object_list %}
+            <option value="{{ category }}">
+            {{ category }}
+            </option>
+        {% endfor %}
+        </select>
+        <input type="submit" value="Categories" id="Categories" name='Categories'>
+    </form>
+
+{% endblock content %}
+{% block script%}
+{%endblock script%}

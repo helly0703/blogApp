@@ -211,7 +211,7 @@ class RemoveFriendView(LoginRequiredMixin, View):
             return redirect(request.META.get('HTTP_REFERER'))
 
 
-class SearchProfileView(ListView):
+class SearchProfileView(LoginRequiredMixin,ListView):
     model = Account
     template_name = "Account/to_invite_list.html"
     context_object_name = 'qs'
