@@ -2,7 +2,7 @@
 {% load static %}
 {%block title%}
 Add Friends
-{%endblock title%}
+{% endblock title%}
 {% block content %}
 {% load crispy_forms_tags %}
     {% if user.is_authenticated %}
@@ -29,7 +29,6 @@ Add Friends
                         {% csrf_token%}
                           <input type="hidden" name="profile_pk" value="{{ object.id }}" >
                         {% if object.user not in user.account.blockedlist.all%}
-<!--                          <button type="submit" class="btn btn-primary ">Add Friend</button>-->
                            {%if object in user.account.check_received_request%}
 
                         <form action="{% url 'accept_request' %}" method="post">

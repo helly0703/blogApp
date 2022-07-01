@@ -10,9 +10,9 @@ from Account.models import Account
 class Post(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()
-    image = models.ImageField( null=True, default=None, blank=True, upload_to='blog_pics/')
+    image = models.ImageField(null=True, default=None, blank=True, upload_to='blog_pics/')
     date_posted = models.DateTimeField(default=timezone.now)
-    # category_id = models.ForeignKey(PostCategory, on_delete=models.SET_DEFAULT(None))
+    category = models.CharField(max_length=255)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     liked = models.ManyToManyField(Account, blank=True, related_name='likes')
     saved = models.ManyToManyField(Account, blank=True, related_name='saved')
@@ -49,19 +49,27 @@ class Post(models.Model):
         ordering = ('-date_posted',)
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('blogs')
+
+
 class Comment(models.Model):
-    user = models.ForeignKey(Account,on_delete=models.CASCADE)
-    post = models.ForeignKey(Post,on_delete=models.CASCADE)
+    user = models.ForeignKey(Account, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
     body = models.TextField(max_length=300)
     created = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return str(self.pk)
 
-
     class Meta:
         ordering = ('-created',)
-
 
 
 LIKE_CHOICES = (
@@ -94,9 +102,3 @@ class SavePost(models.Model):
 
     def __str__(self):
         return f"{self.user}-{self.post}-{self.value}"
-
-
-
-
-
-

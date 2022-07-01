@@ -1,6 +1,11 @@
 from django import forms
+from blogs.models import Post, Category
 
-from blogs.models import Post
+choices = Category.objects.all().values_list('name','name')
+print(choices)
+choice_list = []
+for item in choices:
+    choice_list.append(item)
 
 
 class BlogCreateForm(forms.ModelForm):
@@ -8,4 +13,8 @@ class BlogCreateForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ['title', 'content', 'image']
+        fields = ['title', 'content', 'image', 'category']
+
+        widgets = {
+            'category': forms.Select(choices=choice_list,attrs={'class': 'form-control'}),
+        }
