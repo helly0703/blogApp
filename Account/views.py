@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.http import HttpResponse, JsonResponse
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView
@@ -120,7 +121,7 @@ class AcceptInvitesView(LoginRequiredMixin, View):
             if rel.status == 'send':
                 rel.status = 'accepted'
                 rel.save()
-        return redirect(request.META.get('HTTP_REFERER'))
+        return HttpResponse('Success')
 
 
 class RejectInvitesView(LoginRequiredMixin, View):
@@ -131,7 +132,7 @@ class RejectInvitesView(LoginRequiredMixin, View):
             receiver = Account.objects.get(user=self.request.user)
             rel = get_object_or_404(Relationship, sender=sender, receiver=receiver)
             rel.delete()
-        return redirect(request.META.get('HTTP_REFERER'))
+        return HttpResponse('Success')
 
 
 class InvitesProfileListView(LoginRequiredMixin, ListView):
@@ -179,7 +180,7 @@ class SendInviteView(LoginRequiredMixin, View):
     def post(self, request):
         if self.request.method == 'POST':
             pk = self.request.POST.get('profile_pk')
-
+            print(f"PK {pk}")
             user = self.request.user
             sender = Account.objects.get(user=user)
             receiver = Account.objects.get(pk=pk)
@@ -193,8 +194,9 @@ class SendInviteView(LoginRequiredMixin, View):
                 if block_user in sender.blockedlist.all():
                     sender.blockedlist.remove(block_user)
                 Relationship.objects.create(sender=sender, receiver=receiver, status='send')
+            msg = 'Success'
 
-        return redirect('invite_profiles')
+        return HttpResponse(msg)
 
 
 class RemoveFriendView(LoginRequiredMixin, View):
@@ -218,7 +220,7 @@ class SearchProfileView(LoginRequiredMixin,ListView):
 
     def get_queryset(self):
         query = self.request.GET.get("search_field")
-        print(query)
+        # print(query)
         qs1 = Account.objects.filter(
             Q(name__icontains=query)
         )

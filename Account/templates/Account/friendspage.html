@@ -17,15 +17,19 @@
                     </h5>
                   </div>
                   <div class="col-md-3 col-sm-3">
-                      <form action="{%url 'remove_friend' %}" method="post">
+                      <form id="remove-friend">
                           {% csrf_token%}
                             <input type="hidden" name="profile_pk" value="{{ object.account.id }}">
-                            <button class="btn btn-primary pull-right">Remove from friends</button>
+                            <button type="button" id="remove-frnd" class="btn btn-primary pull-right"
+                                    value="{{ object.account.id }}">Remove from
+                                friends</button>
                         </form>
-                      <form action="{%url 'block_profile' %}" method="post">
+                      <form id="block-friend">
                           {% csrf_token%}
                             <input type="hidden" name="profile_pk" value="{{ object.id }}">
-                            <button class="btn btn-primary pull-right">Block friends</button>
+                            <button type="button" id="block-frnd" value="{{ object.id }}"
+                                    class="btn btn-primary pull-right">Block
+                                friends</button>
                         </form>
                   </div>
                 </div>
@@ -35,3 +39,54 @@
         <small class="text-muted"><a href="{% url 'login' %}" class="ml-2">Login</a></small>
     {% endif %}
 {% endblock content %}
+{% block scripts%}
+<script>
+$(document).ready(function(){
+window.onload = function() {
+	if(!window.location.hash) {
+		window.location = window.location;
+		window.location.reload();
+	}
+};
+console.log('Hey');
+$.ajaxSetup({
+       headers: {
+         "X-CSRFToken": $('[name=csrfmiddlewaretoken]').val()
+       }
+   });
+$("#remove-frnd").click(function() {
+    var user = $(this).val()
+    event.preventDefault();
+    $.ajax({
+      type: "POST",
+      url: "{%url 'remove_friend' %}",
+      data: {
+        'profile_pk': user,
+        },
+      success:  function () {
+        console.log('Success');
+        location.reload();
+       },
+    });
+    return false;
+  });
+  $("#block-frnd").click(function() {
+    var user = $(this).val()
+    event.preventDefault();
+    $.ajax({
+      type: "POST",
+      url: "{%url 'block_profile' %}",
+      data: {
+        'profile_pk': user,
+        },
+      success:  function () {
+        console.log('Success');
+        location.reload();
+       },
+    });
+    return false;
+  });
+});
+</script>>
+{% endblock scripts%}
+

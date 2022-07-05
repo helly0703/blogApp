@@ -39,7 +39,9 @@
             <a class="card-link" href="{% url 'blog-post' post.id %}">
                 <h2 class="card-title">{{ post.title }}</h2>
             </a>
+            {% if post.image.url != None%}
             <img height="500px" width="700px" src="{{ post.image.url }}" alt="">
+            {% endif %}
 
             <p style="font-size:20px">
                 {{ post.content|truncatewords:60  }}
@@ -70,7 +72,6 @@
         {% endif %}
     </span>
 </div>
-
 
 {% endblock content %}
 

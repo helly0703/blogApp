@@ -66,25 +66,25 @@
                             <input type="hidden" name="profile_pk" value="{{ object.id }}">
                             <button type="submit" class="btn btn-primary pull-right">Remove from Friend Request</button>
                         </form>
-                    <a href="{% url 'chat' %}" class="ml-2">Login</a>
 
 
                     {%elif object in user.account.check_send_request%}
                         <button class="btn btn-primary pull-right" disabled>Waiting for response</button>
 
                     {% elif object.get_user not in user.account.friendslist.all %}
-                        <form action="{%url 'send_invite' %}" method="post">
+                        <form id="add-friend">
                             {% csrf_token%}
-                            <input type="hidden" name="profile_pk" value="{{ object.id }}">
-                            <button class="btn btn-primary pull-right">Add friend</button>
+                            <input type="hidden" name="profile_pk" class="user_id" id="user_id" value="{{ object.id }}">
+                            <button id="add-frnd" type="button" class="btn btn-primary pull-right"
+                                    value="{{ object.id }}">Add friend</button>
                         </form>
 
                     {% else%}
 
-                    <form action="{%url 'remove_friend' %}" method="post">
+                    <button id="remove-frnd" type="button" class="btn btn-primary pull-right" value="{{ object.id}}">Remove from
+                        friends</button>
+                    <form>
                         {% csrf_token%}
-                        <input type="hidden" name="profile_pk" value="{{ object.id }}">
-                        <button class="btn btn-primary pull-right">Remove from friends</button>
                     </form>
 
                     {% endif %}
@@ -104,7 +104,6 @@
                                     </div>
                                     <div>
                                         <div class="dropdown">
-
                                             <form action="{% url 'save-post'%}" method="post">
                                                 {% csrf_token%}
                                                 <input type="hidden" name="post_id" value="{{post.id}}">
@@ -127,7 +126,9 @@
                                 <a class="card-link" href="{% url 'blog-post' post.id %}">
                                     <h2 class="card-title">{{ post.title }}</h2>
                                 </a>
+                                {% if post.image.url != None%}
                                 <img height="500px" width="600px" src="{{ post.image.url }}" alt="">
+                                {% endif%}
 
                                 <p style="font-size:20px">
                                     {{ post.content}}
@@ -153,3 +154,87 @@
         <small class="text-muted"><a href="{% url 'login' %}" class="ml-2">Login</a></small>
     {% endif %}
 {% endblock content %}
+
+{% block scripts%}
+<script>
+$(document).ready(function(){
+window.onload = function() {
+	if(!window.location.hash) {
+		window.location = window.location;
+		window.location.reload();
+	}
+};
+console.log('Hey');
+$.ajaxSetup({
+       headers: {
+         "X-CSRFToken": $('[name=csrfmiddlewaretoken]').val()
+       }
+   });
+$("#add-frnd").click(function() {
+    var user = $(this).val()
+    event.preventDefault();
+    $.ajax({
+      type: "POST",
+      url: "{% url 'send_invite' %}",
+      data: {
+        'profile_pk': user,
+        },
+      success:  function () {
+        console.log('Success');
+        location.reload();
+       },
+    });
+    return false;
+  });
+  $("#remove-frnd").click(function() {
+    var user = $(this).val()
+    event.preventDefault();
+    $.ajax({
+      type: "POST",
+      url: "{%url 'remove_friend' %}",
+      data: {
+        'profile_pk': user,
+        },
+      success:  function () {
+        console.log('Success');
+        location.reload();
+       },
+    });
+    return false;
+  });
+  $("#accept-frnd").click(function() {
+    var user = $(this).val()
+    event.preventDefault();
+    $.ajax({
+      type: "POST",
+      url: "{% url 'send_invite' %}",
+      data: {
+        'profile_pk': user,
+        },
+      success:  function () {
+        console.log('Success');
+        location.reload();
+       },
+    });
+    return false;
+  });
+  $("#reject-frnd").click(function() {
+    var user = $(this).val()
+    event.preventDefault();
+    $.ajax({
+      type: "POST",
+      url: "{% url 'send_invite' %}",
+      data: {
+        'profile_pk': user,
+        },
+      success:  function () {
+        console.log('Success');
+        location.reload();
+       },
+    });
+    return false;
+  });
+});
+</script>>
+{% endblock scripts%}
+

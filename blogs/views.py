@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import View
@@ -76,11 +77,14 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 
 class PostLikeView(LoginRequiredMixin, View):
+
     def post(self, request, *args, **kwargs):
+        print('jhbshjbdsjkncdkasjmklml')
         user = self.request.user
-        pk = kwargs['pk']
+        # pk = kwargs['pk']
         if request.method == 'POST':
             post_id = request.POST.get('post_id')
+            print(post_id)
             post_obj = Post.objects.get(id=post_id)
             profile = Account.objects.get(user=user)
             if profile in post_obj.liked.all():
@@ -95,10 +99,11 @@ class PostLikeView(LoginRequiredMixin, View):
                     like.value = 'Unlike'
                 else:
                     like.value = 'Like'
+                msg = like.value
 
                 post_obj.save()
                 like.save()
-        return redirect('blog-post', pk=pk)
+        return HttpResponse(msg)
 
 
 class PostCommentCreateView(LoginRequiredMixin, View):
@@ -108,10 +113,13 @@ class PostCommentCreateView(LoginRequiredMixin, View):
         user = self.request.user
         if request.method == 'POST':
             post_id = request.POST.get('post_id')
-            comment = request.POST.getlist("comment")
+            print(post_id)
+            comment = request.POST.getlist('comment')
+            print(comment)
             profile = Account.objects.get(user=user)
             Comment.objects.get_or_create(user=profile, post_id=post_id, body=comment[0])
-        return redirect('blog-post', pk=pk)
+            msg='Success'
+        return HttpResponse(msg)
 
 
 class PostCommentListView(LoginRequiredMixin, ListView):
@@ -149,6 +157,7 @@ class PostSaveView(LoginRequiredMixin, View):
         print(user)
         if request.method == 'POST':
             post_id = request.POST.get('post_id')
+            print(post_id)
             post_obj = Post.objects.get(id=post_id)
             profile = Account.objects.get(user=user)
             if profile in post_obj.saved.all():
@@ -160,15 +169,21 @@ class PostSaveView(LoginRequiredMixin, View):
             print(saved.value)
             if not created:
                 if saved.value == 'Save':
+                    msg='Save'
                     saved.value = 'Unsave'
                 else:
+                    msg='Unsave'
                     saved.value = 'Save'
 
             print(saved.value)
+            if saved.value == 'Save':
+                msg = 'Unsave'
+            elif saved.value == 'Unsave':
+                msg = 'Save'
 
-        post_obj.save()
-        saved.save()
-        return redirect(request.META.get('HTTP_REFERER'))
+            post_obj.save()
+            saved.save()
+        return HttpResponse(msg)
 
 
 class PostFilterView(LoginRequiredMixin, ListView):

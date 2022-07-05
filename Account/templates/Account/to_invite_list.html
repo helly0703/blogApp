@@ -6,7 +6,7 @@ Add Friends
 {% block content %}
 {% load crispy_forms_tags %}
     {% if user.is_authenticated %}
-        <a href="javascript:history.go(-1)" class="btn btn-outline-secondary">Back</a>
+<!--        <a href="javascript:history.go(-1)" class="btn btn-outline-secondary">Back</a>-->
         <div class="container">
             <form action="{% url 'search_profile' %}" name="search-profile" id="search-profile" method="get">
                 {% csrf_token%}
@@ -47,24 +47,27 @@ Add Friends
                         <button class="btn btn-primary pull-right" disabled>Waiting for response</button>
 
                     {% elif object.get_user not in user.account.friendslist.all %}
-                        <form action="{%url 'send_invite' %}" method="post">
+                        <form id="add-friend">
                             {% csrf_token%}
-                            <input type="hidden" name="profile_pk" value="{{ object.id }}">
-                            <button class="btn btn-primary pull-right">Add friend</button>
+                            <input type="hidden" name="profile_pk" class="user_id" id="user_id" value="{{ object.id }}">
+                            <button type="button"  id="add-frnd" class="btn btn-primary pull-right"
+                                    value="{{ object.id }}">Add friend</button>
                         </form>
 
                     {% else%}
 
-                    <form action="{%url 'remove_friend' %}" method="post">
+                    <form id="remove-friend">
                         {% csrf_token%}
                         <input type="hidden" name="profile_pk" value="{{ object.id }}">
-                        <button class="btn btn-primary pull-right">Remove from friends</button>
+                        <button type="button" id="remove-frnd" value="{{ object.id }}"
+                                class="btn btn-primary pull-right">Remove from friends</button>
                     </form>
 
                     {% endif %}
 
                         {% else%}
-                          <button type="submit" class="btn btn-primary ">Unblock and Add friend</button>
+                          <button  type="button"  id="add-frnds" class="btn btn-primary"
+                                   value="{{ object.id }}">Unblock and Add friend</button>
                         {% endif %}
                       </form>
 
@@ -81,13 +84,74 @@ Add Friends
 
 
 
-{% block script%}
-
+{% block scripts%}
+<script>
 $(document).ready(function(){
+window.onload = function() {
+	if(!window.location.hash) {
+		window.location = window.location;
+		window.location.reload();
+	}
+};
+console.log('Hey');
 $('#search_field').keyup(function(){
   $('#search-profile').submit();
 });
-};
-
-{% endblock script%}
-
+$.ajaxSetup({
+       headers: {
+         "X-CSRFToken": $('[name=csrfmiddlewaretoken]').val()
+       }
+   });
+$("#add-frnd").click(function() {
+    var user = $(this).val()
+    event.preventDefault();
+    $.ajax({
+      type: "POST",
+      url: "{% url 'send_invite' %}",
+      data: {
+        'profile_pk': user,
+        },
+      success:  function () {
+        console.log('Success');
+        location.reload();
+       },
+    });
+    return false;
+  });
+  $("#add-frnds").click(function() {
+    var user = $(this).val()
+    event.preventDefault();
+    $.ajax({
+      type: "POST",
+      url: "{% url 'send_invite' %}",
+      data: {
+        'profile_pk': user,
+        },
+      success:  function () {
+        console.log('Success');
+        location.reload();
+       },
+    });
+    return false;
+  });
+  $("#remove-frnd").click(function() {
+    console.log('Start');
+    var user = $(this).val();
+    console.log(user);
+    event.preventDefault();
+    $.ajax({
+      type: "POST",
+      url: "{%url 'remove_friend' %}",
+      data: {
+        'profile_pk': user,
+        },
+      success:  function () {
+        console.log('Success');
+        location.reload();
+       },
+    });
+    return false;
+  });
+});
+</script>>
+{% endblock scripts%}
