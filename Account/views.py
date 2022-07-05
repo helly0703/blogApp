@@ -195,7 +195,6 @@ class SendInviteView(LoginRequiredMixin, View):
                     sender.blockedlist.remove(block_user)
                 Relationship.objects.create(sender=sender, receiver=receiver, status='send')
             msg = 'Success'
-
         return HttpResponse(msg)
 
 

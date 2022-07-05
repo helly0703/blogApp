@@ -101,6 +101,8 @@ $(document).ready(function () {
         },
        success:  function (msg) {        // Getting msg from the view
         $( ".like-button" ).text(msg);
+        location.reload();
+
        },
 
     });
@@ -125,5 +127,3 @@ $(document).ready(function () {
   });
 </script>
 {% endblock scripts %}
-
-

@@ -26,7 +26,6 @@ urlpatterns = [
     path('home', HomeView.as_view(), name='home'),  # Takes to the blogs page after login
     path('home/profile/', views.profile, name='profile'),  # Takes to the user profile page
     path('home/profile/settings', SettingsFormView.as_view(), name='settings'),  # Takes to the user profile page
-
     path('home/friends/', FriendView.as_view(), name='friends_page'),
     path('home/friends/<int:pk>/', FriendDetailView.as_view(), name='friend_detail'),
     path('home/friends/<int:pk>/add', ViewFriendDetailView.as_view(), name='friend_request'),
