@@ -16,27 +16,24 @@ let endpoint = wsStart + loc.host + loc.pathname
 //socket is inbuilt packet of js
 // creating new Websocket object and endpoint is the url
 var socket = new WebSocket(endpoint)
-let selector_func = function(e){
-        e.preventDefault()
-        let message = input_message.val()
-        let send_to;
-        if (USER_ID == 2)
-            send_to = 13
-        else
-            send_to = 2
-        let data = {
-            'message': message,
-            'sent_by': USER_ID,
-            'send_to': send_to
-         }
-        data = JSON.stringify(data)
-        socket.send(data)
-        $(this)[0].reset()
-    }
 
 socket.onopen = async function(e){
     console.log('open',e);
-    send_message_form.on('submit',selector_func);
+    send_message_form.on('submit',function(e){
+        e.preventDefault()
+        let message = input_message.val()
+        let send_to = get_active_other_user_id();
+        let thread_id = get_active_thread_id()
+        let data = {
+            'message': message,
+            'sent_by': USER_ID,
+            'send_to': send_to,
+            'thread_id': thread_id
+         }
+        data = JSON.stringify(data)
+        socket.send(data)
+        $(this)[addEventListener0].reset()
+    });
 
 }
 
@@ -46,7 +43,8 @@ socket.onmessage = async function(e){
     console.log(data['message']);
     let message = data['message']
     let sent_by_id = data['sent_by']
-    newMessage(message, sent_by_id);
+    let thread_id = data['thread_id']
+    newMessage(message, sent_by_id, thread_id);
 }
 
 socket.onerror = async function(e){
@@ -61,12 +59,14 @@ socket.onclose = async function(e){
 
 
 
-function newMessage(message, sent_by_id){
+function newMessage(message, sent_by_id, thread_id){
     if ($.trim(message) === ''){
         return false;
     }
     let message_element;
+    let chat_id = 'chat_' + thread_id
     if (sent_by_id == USER_ID){
+        console.log('Its the sender')
         message_element =`
             <div class="d-flex mb-4 replied">
                 <div class="msg_cotainer_send">
@@ -92,11 +92,33 @@ function newMessage(message, sent_by_id){
             </div>
         `
     }
-
-    message_body.append($(message_element));
-    message_body.animate({
-        scrollTop: $(document).height()
-    }, 100);
+    let message_body = $('.messages-wrapper[chat-id="' + chat_id + '"] .msg_card_body')
+    message_body.append($(message_element))
+    message_body.animate({ scrollTop: 2000 }, 3000);
     input_message.val(null);
 }
+
+
+
+$('.contact-li').on('click',function (){
+    $('.contacts.active').removeClass('active')
+    $(this).addClass('active')
+
+    // message wrappers
+    let chat_id = $(this).attr('chat-id')
+    $('.messages-wrapper.is_active').removeClass('is_active')
+    $('.messages-wrapper[chat-id="' + chat_id +'"]').addClass('is_active')
+})
+
+function get_active_other_user_id(){
+    let other_user_id = $('.messages-wrapper.is_active').attr('other-user-id')
+    other_user_id = $.trim(other_user_id)
+    return other_user_id
+}
+
+function get_active_thread_id(){
+    let chat_id = $('.messages-wrapper.is_active').attr('chat-id')
+    let thread_id = chat_id.replace('chat_','')
+    return thread_id
+ }
 

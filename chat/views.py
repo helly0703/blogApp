@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 
 # Create your views here.
 from django.views import View
+from .models import Thread
 
 
 class ChatHomeView(LoginRequiredMixin, View):
@@ -10,4 +11,8 @@ class ChatHomeView(LoginRequiredMixin, View):
         if not self.request.user.is_authenticated:
             return redirect('login')
         else:
-            return render(request, 'chat/start-chat.html')
+            threads = Thread.objects.by_user(user=self.request.user).prefetch_related('chatmessage_thread')
+            context = {
+                'Threads': threads
+            }
+            return render(request, 'chat/start-chat.html',context)
