@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
@@ -18,17 +19,26 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 # Create your views here.
 class HomeView(LoginRequiredMixin, ListView):
-    paginate_by = 5
+    paginate_by = 2
     model = Post
     template_name = 'blogs/feed.html'
-    context_object_name = 'qs'
 
-    #  getting personal and friends posts
-    def get_queryset(self, **kwargs):
-        qs = Post.objects.filter(
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(HomeView, self).get_context_data()
+        posts = Post.objects.filter(
             Q(author__in=self.request.user.account.friendslist.all()) | Q(author=self.request.user)).order_by(
             '-date_posted')
-        return qs
+        paginator = Paginator(posts, self.paginate_by)
+        page = self.request.GET.get('page')
+        try:
+            post_list = paginator.page(page)
+        except PageNotAnInteger:
+            post_list = paginator.page(1)
+        except EmptyPage:
+            post_list = paginator.page(paginator.num_pages)
+        context['posts'] = post_list
+        context['categories'] = Category.objects.all()
+        return context
 
 
 class PostDetailView(LoginRequiredMixin, DetailView):
@@ -49,12 +59,12 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
-    fields = ['title', 'content', 'image']
+    form_class = BlogCreateForm
     success_url = reverse_lazy('blogs')
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        return super().form_valid(form)
+        return super(PostUpdateView, self).form_valid(form)
 
     def test_func(self):
         post = self.get_object()
@@ -79,7 +89,6 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 class PostLikeView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
-        print('jhbshjbdsjkncdkasjmklml')
         user = self.request.user
         # pk = kwargs['pk']
         if request.method == 'POST':
@@ -187,19 +196,23 @@ class PostSaveView(LoginRequiredMixin, View):
 
 
 class PostFilterView(LoginRequiredMixin, ListView):
+    paginate_by = 5
     model = Post
     template_name = "blogs/feed.html"
-    context_object_name = 'qs'
 
-    def get_queryset(self):
+
+    def get_context_data(self, *, object_list=None, **kwargs):
         query = self.request.GET.get("category-id")
-        print(query)
         posts = Post.objects.filter(category=query)
-        qs=[]
+        qs = []
         for item in posts:
             if item.author in self.request.user.account.friendslist.all() or item.author == self.request.user:
                 qs.append(Post.objects.get(title=item))
-        return qs
+        context = super(PostFilterView, self).get_context_data()
+        context['posts'] = qs
+        context['categories'] = Category.objects.all()
+        print(context)
+        return context
 
 
 class CategoryListView(LoginRequiredMixin, ListView):

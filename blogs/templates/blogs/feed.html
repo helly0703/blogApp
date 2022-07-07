@@ -2,8 +2,19 @@
 {%block title%}Posts{%endblock title%}
 
 {% block content %}
-
-<a class="nav-link active"  href="{% url 'filter-blog' %}" onclick="">Filter Blogs</a>
+<div class="card gedf-card">
+    <form action="{% url 'category-list'%}" name="filter-blog" id="filter-blog" method="GET">
+        {% csrf_token%}
+        <select id="category-id" name="category-id">
+            {% for category in categories %}
+            <option value="{{ category }}">
+                {{ category }}
+            </option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Categories" id="Categories" name='Categories'>
+    </form>
+</div>
 <div class="card gedf-card">
     <div class="card-header">
         <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
@@ -14,13 +25,12 @@
     </div>
 </div>
 <br>
-{% for post in qs %}
+{% for post in posts %}
     <div class="card gedf-card">
         <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="mr-2">
-
                         <img class="rounded-circle" width="45" src="{{ post.author.account.image.url }}" alt="">
                     </div>
                     <div class="ml-2">
@@ -41,7 +51,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
         <div class="card-body">
             <div class="text-muted h7 mb-2"> <i class="fa fa-clock-o"></i>{{ post.date_posted  }}</div>
@@ -64,23 +73,33 @@
         </div>
     </div>
 {% endfor %}
+{% if posts%}
+{% if is_paginated %}
 <div class="pagination">
     <span class="step-links">
-        {% if page_obj.has_previous %}
+        {% if posts.has_previous %}
             <a href="?page=1">&laquo; first</a>
-            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+            <a href="?page={{ posts.previous_page_number }}">previous</a>
+        {% endif %}
+        {%if posts.number%}
+            <span class="current">
+                Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
+            </span>
+        {% else %}
+            <span class="current">
+                Page 1 of 1.
+            </span>
         {% endif %}
 
-        <span class="current">
-            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-        </span>
 
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">next</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% if posts.has_next %}
+            <a href="?page={{ posts.next_page_number }}">next</a>
+            <a href="?page={{ posts.paginator.num_pages }}">last &raquo;</a>
         {% endif %}
     </span>
 </div>
+{% endif %}
+{% endif %}
 
 
 {% endblock content %}

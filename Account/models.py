@@ -1,6 +1,6 @@
 from django.db import models
 from PIL import Image
-from django.contrib.auth.models import User, AbstractUser
+from django.contrib.auth.models import User
 from datetime import date
 from django.db.models import Q
 

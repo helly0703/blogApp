@@ -94,9 +94,7 @@ window.onload = function() {
 	}
 };
 console.log('Hey');
-$('#search_field').keyup(function(){
-  $('#search-profile').submit();
-});
+
 $.ajaxSetup({
        headers: {
          "X-CSRFToken": $('[name=csrfmiddlewaretoken]').val()

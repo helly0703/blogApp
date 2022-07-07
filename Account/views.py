@@ -14,6 +14,7 @@ from django.contrib.auth.decorators import login_required
 from Account.forms import UserUpdateForm, AccountUpdateForm
 from .models import Account, Relationship
 from django.db.models import Q
+from blogs.models import Category
 
 
 class SignUpView(SuccessMessageMixin, CreateView):
@@ -258,12 +259,18 @@ class MyBlogsView(LoginRequiredMixin, ListView):
     paginate_by = 5
     model = Post
     template_name = 'blogs/feed.html'
-    context_object_name = 'qs'
+    # context_object_name = 'qs'
+    #
+    # def get_queryset(self):
+    #     user = self.request.user
+    #
+    #     qs = Post.objects.filter(author=user)
+    #     return qs
 
-    def get_queryset(self):
+    def get_context_data(self, *, object_list=None, **kwargs):
         user = self.request.user
-
-        qs = Post.objects.filter(author=user)
-        return qs
-
+        context = super(MyBlogsView, self).get_context_data()
+        context['posts'] = Post.objects.filter(author=user)
+        context['categories'] = Category.objects.all()
+        return context
 
