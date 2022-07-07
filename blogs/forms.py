@@ -2,7 +2,6 @@ from django import forms
 from blogs.models import Post, Category
 
 choices = Category.objects.all().values_list('name','name')
-print(choices)
 choice_list = []
 for item in choices:
     choice_list.append(item)
