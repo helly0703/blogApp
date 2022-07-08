@@ -4,10 +4,8 @@ let send_message_form = $('#send-message-form')
 const USER_ID = $('#logged-in-user').val()
 console.log('Start');
 let loc = window.location
-let wsStart = 'ws://'
 
-
-wsStart = 'wss://'
+let wsStart = 'wss://'
 
 
 // getting endpoint
