@@ -4,9 +4,10 @@ let send_message_form = $('#send-message-form')
 const USER_ID = $('#logged-in-user').val()
 console.log('Start');
 let loc = window.location
-let wsStart = 'wss://'
+let wsStart = 'ws://'
 
-if (loc.protocol === 'https'){
+console.log(loc.protocol)
+if (loc.protocol === 'https:'){
     wsStart = 'wss://'
 }
 
