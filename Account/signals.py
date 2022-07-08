@@ -4,7 +4,6 @@ from django.dispatch import receiver
 from .models import Account, Relationship
 from chat.models import Thread
 from notifications.models import Notifications
-from django.utils.crypto import get_random_string
 
 
 # To create account instance

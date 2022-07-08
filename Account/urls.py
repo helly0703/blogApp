@@ -5,7 +5,6 @@ from Account.views import (
     HomeView,
     FriendView,
     FriendDetailView,
-    ViewFriendDetailView,
     InvitesReceivedView,
     InvitesProfileListView,
     ProfileListView,
@@ -23,12 +22,11 @@ from notifications.views import NotificationsListView
 
 urlpatterns = [
     path('', SignUpView.as_view(), name='register'),
-    path('home', HomeView.as_view(), name='home'),  # Takes to the blogs page after login
-    path('home/profile/', views.profile, name='profile'),  # Takes to the user profile page
-    path('home/profile/settings', SettingsFormView.as_view(), name='settings'),  # Takes to the user profile page
+    path('home', HomeView.as_view(), name='home'),
+    path('home/profile/', views.profile, name='profile'),
+    path('home/profile/settings', SettingsFormView.as_view(), name='settings'),
     path('home/friends/', FriendView.as_view(), name='friends_page'),
     path('home/friends/<int:pk>/', FriendDetailView.as_view(), name='friend_detail'),
-    path('home/friends/<int:pk>/add', ViewFriendDetailView.as_view(), name='friend_request'),
     path('home/my-invites', InvitesReceivedView.as_view(), name='my_invites'),
     path('home/all-profiles', ProfileListView.as_view(), name='all_profiles'),
     path('home/search-profile', SearchProfileView.as_view(), name='search_profile'),
@@ -37,8 +35,6 @@ urlpatterns = [
     path('home/send-invite', SendInviteView.as_view(), name='send_invite'),
     path('home/remove-friend', RemoveFriendView.as_view(), name='remove_friend'),
     path('home/my-blogs', MyBlogsView.as_view(), name='my_blogs'),
-
-
     path('home/accept-request', AcceptInvitesView.as_view(), name='accept_request'),
     path('home/remove-request', RejectInvitesView.as_view(), name='remove_request'),
     path('home/notifications', NotificationsListView.as_view(), name='notifications'),

@@ -6,6 +6,7 @@ choice_list = []
 for item in choices:
     choice_list.append(item)
 
+
 class BlogCreateForm(forms.ModelForm):
     image = forms.ImageField(required=False)
 
@@ -14,5 +15,5 @@ class BlogCreateForm(forms.ModelForm):
         fields = ['title', 'content', 'image', 'category']
 
         widgets = {
-            'category': forms.Select(choices=choice_list,attrs={'class': 'form-control'}),
+            'category': forms.Select(choices=choice_list, attrs={'class': 'form-control'}),
         }

@@ -12,7 +12,7 @@ class Post(models.Model):
     content = models.TextField()
     image = models.ImageField(null=True, default=None, blank=True, upload_to='blog_pics/')
     date_posted = models.DateTimeField(default=timezone.now)
-    category = models.CharField(blank=True, default='Uncategorized',max_length=255)
+    category = models.CharField(blank=True, default='Uncategorized', max_length=255)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     liked = models.ManyToManyField(Account, blank=True, related_name='likes')
     saved = models.ManyToManyField(Account, blank=True, related_name='saved')
@@ -31,9 +31,6 @@ class Post(models.Model):
         comment_list = Comment.objects.all().filter(post=self)[:5]
         return comment_list
 
-    def get_absolute_url(self):
-        return reverse('post-detail', kwargs={'pk': self.pk})
-
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
@@ -47,6 +44,9 @@ class Post(models.Model):
 
     class Meta:
         ordering = ('-date_posted',)
+
+    def get_absolute_url(self):
+        return reverse('post-detail', kwargs={'pk': self.pk})
 
 
 class Category(models.Model):

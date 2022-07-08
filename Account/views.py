@@ -97,10 +97,6 @@ class FriendDetailView(LoginRequiredMixin, DetailView):
     template_name = 'Account/frienddetail.html'
 
 
-class ViewFriendDetailView(LoginRequiredMixin, UserPassesTestMixin, View):
-    pass
-
-
 class InvitesReceivedView(LoginRequiredMixin, ListView):
     model = Relationship
     template_name = 'Account/invites.html'
@@ -213,7 +209,7 @@ class RemoveFriendView(LoginRequiredMixin, View):
             return redirect(request.META.get('HTTP_REFERER'))
 
 
-class SearchProfileView(LoginRequiredMixin,ListView):
+class SearchProfileView(LoginRequiredMixin, ListView):
     model = Account
     template_name = "Account/to_invite_list.html"
     context_object_name = 'qs'
@@ -235,7 +231,7 @@ class SearchProfileView(LoginRequiredMixin,ListView):
         return set(qs)
 
 
-class BlockUserCreateView(LoginRequiredMixin,View):
+class BlockUserCreateView(LoginRequiredMixin, View):
     def post(self, request):
         if self.request.method == 'POST':
             pk = self.request.POST.get('profile_pk')
@@ -259,6 +255,7 @@ class MyBlogsView(LoginRequiredMixin, ListView):
     paginate_by = 5
     model = Post
     template_name = 'blogs/feed.html'
+
     # context_object_name = 'qs'
     #
     # def get_queryset(self):
@@ -273,4 +270,3 @@ class MyBlogsView(LoginRequiredMixin, ListView):
         context['posts'] = Post.objects.filter(author=user)
         context['categories'] = Category.objects.all()
         return context
-

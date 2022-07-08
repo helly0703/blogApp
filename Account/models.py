@@ -5,7 +5,6 @@ from datetime import date
 from django.db.models import Q
 
 
-
 class AccountManager(models.Manager):
 
     def get_all_profiles_to_invites(self, sender):
@@ -46,12 +45,11 @@ class Account(models.Model):
                               choices=[('MALE', 'MALE'), ('FEMALE', 'FEMALE')],
                               )
     privacy_mode = models.CharField(null=True, max_length=7, choices=[('PUBLIC', 'PUBLIC'), ('PRIVATE', 'PRIVATE')],
-                                    editable=True,default='PRIVATE')
-    allow_notification = models.BooleanField(null=True, editable=True,default=True)
-    description = models.CharField(default='',blank=True, null=True, max_length=50)
+                                    editable=True, default='PRIVATE')
+    allow_notification = models.BooleanField(null=True, editable=True, default=True)
+    description = models.CharField(default='', blank=True, null=True, max_length=50)
     friendslist = models.ManyToManyField(User, related_name='friendslist', null=True, default=None, blank=True)
     blockedlist = models.ManyToManyField(User, related_name='blocklist', null=True, default=None, blank=True)
-
 
     objects = AccountManager()
 
@@ -98,14 +96,14 @@ class Account(models.Model):
         return posts
 
     def check_send_request(self):
-        qs = Relationship.objects.filter(sender=self,status='send')
+        qs = Relationship.objects.filter(sender=self, status='send')
         receivers = []
         for obj in qs:
             receivers.append(obj.receiver)
         return receivers
 
     def check_received_request(self):
-        qs = Relationship.objects.filter(receiver=self,status='send')
+        qs = Relationship.objects.filter(receiver=self, status='send')
         senders = []
         for obj in qs:
             senders.append(obj.sender)
@@ -130,8 +128,6 @@ class Relationship(models.Model):
     status = models.CharField(max_length=8, choices=STATUS_CHOICES)
 
     objects = RelationshipManager()
-
-
 
     def __str__(self):
         return f'{self.sender}'
