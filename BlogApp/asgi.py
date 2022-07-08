@@ -12,7 +12,7 @@ import chat.routing
 from channels.auth import AuthMiddlewareStack
 
 application = ProtocolTypeRouter({
-    "http": django_asgi_app,
+    "https": django_asgi_app,
     "websocket": AllowedHostsOriginValidator(
         AuthMiddlewareStack(
             URLRouter(
