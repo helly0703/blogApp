@@ -85,7 +85,7 @@ CHANNEL_LAYERS = {
     }
 }
 
-CSRF_TRUSTED_ORIGINS = ['https://blog-like-fb.herokuapp.com']
+# CSRF_TRUSTED_ORIGINS = ['https://blog-like-fb.herokuapp.com']
 
 WSGI_APPLICATION = 'BlogApp.wsgi.application'
 
