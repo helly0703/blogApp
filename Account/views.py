@@ -7,7 +7,6 @@ from django.views.generic import ListView, DetailView, CreateView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import User
-
 from blogs.models import Post
 from .forms import UserRegisterForm, AccountSettingsForm
 from django.contrib.auth.decorators import login_required
@@ -26,16 +25,25 @@ class SignUpView(SuccessMessageMixin, CreateView):
 
 class HomeView(LoginRequiredMixin, View):
     def get(self, request):
-        if not self.request.user.is_authenticated:
-            return redirect('login')
-        else:
-            return render(request, 'Account/profile_view.html')
+        return redirect('blogs')
 
 
-# View user profile and save changes if updated
-@login_required(login_url='login')  # if not login redirect to login page
-def profile(request):
-    if request.method == 'POST':
+class ProfileView(LoginRequiredMixin, View):
+    def get(self, request):
+        return render(request, 'Account/profile_view.html')
+
+
+class UpdateProfileView(LoginRequiredMixin, View):
+    def get(self, request):
+        u_form = UserUpdateForm(instance=request.user)
+        p_form = AccountUpdateForm(instance=request.user.account)
+        context = {
+            'u_form': u_form,
+            'p_form': p_form
+        }
+        return render(request, 'Account/profile.html', context)
+
+    def post(self, request):
         u_form = UserUpdateForm(request.POST, instance=request.user)
         p_form = AccountUpdateForm(request.POST,
                                    request.FILES,
@@ -46,19 +54,8 @@ def profile(request):
             messages.success(request, f'Your account has been updated!')
             return redirect('profile')
 
-    else:
-        u_form = UserUpdateForm(instance=request.user)
-        p_form = AccountUpdateForm(instance=request.user.account)
-
-    context = {
-        'u_form': u_form,
-        'p_form': p_form
-    }
-    return render(request, 'Account/profile.html', context)
-
 
 class SettingsFormView(LoginRequiredMixin, View):
-
     def get(self, request):
         u_form = AccountSettingsForm(instance=request.user.account)
 
@@ -68,23 +65,14 @@ class SettingsFormView(LoginRequiredMixin, View):
         return render(request, 'Account/settings.html', context)
 
     def post(self, request):
-        if request.method == 'POST':
-            user = Account.objects.get(user=self.request.user)
-            u_form = AccountSettingsForm(request.POST,
-                                         request.FILES,
-                                         instance=request.user.account)
-            if u_form.is_valid():
-                u_form.save()
-                messages.success(request, f'Your account has been updated!')
-                return redirect('settings')
-
-        else:
-            u_form = AccountSettingsForm(instance=request.user.account)
-
-        context = {
-            'u_form': u_form
-        }
-        return render(request, 'Account/settings.html', context)
+        user = Account.objects.get(user=self.request.user)
+        u_form = AccountSettingsForm(request.POST,
+                                     request.FILES,
+                                     instance=request.user.account)
+        if u_form.is_valid():
+            u_form.save()
+            messages.success(request, f'Your account has been updated!')
+            return redirect('settings')
 
 
 class FriendView(LoginRequiredMixin, ListView):
@@ -94,7 +82,7 @@ class FriendView(LoginRequiredMixin, ListView):
 
 class FriendDetailView(LoginRequiredMixin, DetailView):
     model = Account
-    template_name = 'Account/frienddetail.html'
+    template_name = 'Account/friend-detail.html'
 
 
 class InvitesReceivedView(LoginRequiredMixin, ListView):
@@ -110,25 +98,23 @@ class InvitesReceivedView(LoginRequiredMixin, ListView):
 
 class AcceptInvitesView(LoginRequiredMixin, View):
     def post(self, request):
-        if self.request.method == 'POST':
-            pk = self.request.POST.get('profile_pk')
-            sender = Account.objects.get(pk=pk)
-            receiver = Account.objects.get(user=self.request.user)
-            rel = get_object_or_404(Relationship, sender=sender, receiver=receiver)
-            if rel.status == 'send':
-                rel.status = 'accepted'
-                rel.save()
+        pk = self.request.POST.get('profile_pk')
+        sender = Account.objects.get(pk=pk)
+        receiver = Account.objects.get(user=self.request.user)
+        rel = get_object_or_404(Relationship, sender=sender, receiver=receiver)
+        if rel.status == 'send':
+            rel.status = 'accepted'
+            rel.save()
         return HttpResponse('Success')
 
 
 class RejectInvitesView(LoginRequiredMixin, View):
     def post(self, request):
-        if self.request.method == 'POST':
-            pk = self.request.POST.get('profile_pk')
-            sender = Account.objects.get(pk=pk)
-            receiver = Account.objects.get(user=self.request.user)
-            rel = get_object_or_404(Relationship, sender=sender, receiver=receiver)
-            rel.delete()
+        pk = self.request.POST.get('profile_pk')
+        sender = Account.objects.get(pk=pk)
+        receiver = Account.objects.get(user=self.request.user)
+        rel = get_object_or_404(Relationship, sender=sender, receiver=receiver)
+        rel.delete()
         return HttpResponse('Success')
 
 
@@ -139,7 +125,6 @@ class InvitesProfileListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         user = self.request.user
-
         qs = Account.objects.get_all_profiles_to_invites(user)
         return qs
 
@@ -168,45 +153,43 @@ class ProfileListView(ListView):
         context["rel_receiver"] = rel_receiver
         context["rel_sender"] = rel_sender
         context["is_empty"] = False
-        if len(self.get_queryset()) == 0:
+        if not len(self.get_queryset()):
             context["is_empty"] = True
         return context
 
 
 class SendInviteView(LoginRequiredMixin, View):
     def post(self, request):
-        if self.request.method == 'POST':
-            pk = self.request.POST.get('profile_pk')
-            print(f"PK {pk}")
-            user = self.request.user
-            sender = Account.objects.get(user=user)
-            receiver = Account.objects.get(pk=pk)
-            block_user = User.objects.get(pk=receiver.user_id)
+        pk = self.request.POST.get('profile_pk')
+        print(f"PK {pk}")
+        user = self.request.user
+        sender = Account.objects.get(user=user)
+        receiver = Account.objects.get(pk=pk)
+        block_user = User.objects.get(pk=receiver.user_id)
 
-            if receiver.privacy_mode == 'PUBLIC':
-                if block_user in sender.blockedlist.all():
-                    sender.blockedlist.remove(block_user)
-                Relationship.objects.create(sender=sender, receiver=receiver, status='accepted')
-            else:
-                if block_user in sender.blockedlist.all():
-                    sender.blockedlist.remove(block_user)
-                Relationship.objects.create(sender=sender, receiver=receiver, status='send')
-            msg = 'Success'
+        if receiver.privacy_mode == 'PUBLIC':
+            if block_user in sender.blockedlist.all():
+                sender.blockedlist.remove(block_user)
+            Relationship.objects.create(sender=sender, receiver=receiver, status='accepted')
+        else:
+            if block_user in sender.blockedlist.all():
+                sender.blockedlist.remove(block_user)
+            Relationship.objects.create(sender=sender, receiver=receiver, status='send')
+        msg = 'Success'
         return HttpResponse(msg)
 
 
 class RemoveFriendView(LoginRequiredMixin, View):
     def post(self, request):
-        if self.request.method == 'POST':
-            pk = self.request.POST.get('profile_pk')
-            user = self.request.user
-            sender = Account.objects.get(user=user)
-            receiver = Account.objects.get(pk=pk)
-            rel = Relationship.objects.get(
-                (Q(sender=sender) & Q(receiver=receiver)) | (Q(sender=receiver) & Q(receiver=sender))
-            )
-            rel.delete()
-            return redirect(request.META.get('HTTP_REFERER'))
+        pk = self.request.POST.get('profile_pk')
+        user = self.request.user
+        sender = Account.objects.get(user=user)
+        receiver = Account.objects.get(pk=pk)
+        rel = Relationship.objects.get(
+            (Q(sender=sender) & Q(receiver=receiver)) | (Q(sender=receiver) & Q(receiver=sender))
+        )
+        rel.delete()
+        return redirect(request.META.get('HTTP_REFERER'))
 
 
 class SearchProfileView(LoginRequiredMixin, ListView):
@@ -216,53 +199,35 @@ class SearchProfileView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         query = self.request.GET.get("search_field")
-        # print(query)
-        qs1 = Account.objects.filter(
-            Q(name__icontains=query)
-        )
-        qs2 = User.objects.filter(
-            Q(username__icontains=query)
-        )
-        qs = []
-        for item in qs1:
-            qs.append(item)
-        for item in qs2:
-            qs.append(item.account)
-        return set(qs)
+        qs = Account.objects.filter(
+            Q(name__icontains=query) | Q(user__username__icontains=query)
+        ).exclude(name=self.request.user.account.name)
+        return qs
 
 
 class BlockUserCreateView(LoginRequiredMixin, View):
     def post(self, request):
-        if self.request.method == 'POST':
-            pk = self.request.POST.get('profile_pk')
-            user = self.request.user
-            blocked_by = Account.objects.get(user=user)
-            block_user = User.objects.get(pk=pk)
-            blocked_by.blockedlist.add(block_user)
-            if block_user in blocked_by.friendslist.all():
-                blocked_by.friendslist.remove(block_user)
-                block_user.friendslist.remove(blocked_by)
-                rel = get_object_or_404(Relationship, sender=blocked_by, receiver=block_user.account)
-                if rel:
-                    rel.delete()
-                else:
-                    rel = get_object_or_404(Relationship, sender=block_user.account, receiver=blocked_by)
-                    rel.delete()
-            return redirect(request.META.get('HTTP_REFERER'))
+        pk = self.request.POST.get('profile_pk')
+        user = self.request.user
+        blocked_by = Account.objects.get(user=user)
+        block_user = User.objects.get(pk=pk)
+        blocked_by.blockedlist.add(block_user)
+        if block_user in blocked_by.friendslist.all():
+            blocked_by.friendslist.remove(block_user)
+            block_user.friendslist.remove(blocked_by)
+            rel = get_object_or_404(Relationship, sender=blocked_by, receiver=block_user.account)
+            if rel:
+                rel.delete()
+            else:
+                rel = get_object_or_404(Relationship, sender=block_user.account, receiver=blocked_by)
+                rel.delete()
+        return redirect(request.META.get('HTTP_REFERER'))
 
 
 class MyBlogsView(LoginRequiredMixin, ListView):
     paginate_by = 5
     model = Post
     template_name = 'blogs/feed.html'
-
-    # context_object_name = 'qs'
-    #
-    # def get_queryset(self):
-    #     user = self.request.user
-    #
-    #     qs = Post.objects.filter(author=user)
-    #     return qs
 
     def get_context_data(self, *, object_list=None, **kwargs):
         user = self.request.user

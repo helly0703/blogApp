@@ -1,12 +1,9 @@
 <nav class="nav nav-borders">
-        <a class="nav-link " href="{% url 'home' %}" target="__blank">Profile</a>
+        <a class="nav-link " href="{% url 'view_profile' %}" target="__blank">Profile</a>
         <a class="nav-link" href="{% url 'blogs' %}" target="__blank" >Feed</a>
         <a class="nav-link" href="{% url 'my_invites' %}" target="__blank">Friend Requests</a>
         <a class="nav-link" href="{% url 'invite_profiles' %}" target="__blank">Add Friends</a>
         <a class="nav-link" href="{% url 'notifications' %}"  target="__blank">Notifications</a>
         <a class="nav-link" href="{% url 'start-chat' %}"  target="__blank">Messenger</a>
-
-<!--        <a class="nav-link" href="{% url 'all_profiles' %}"  target="__blank">Search</a>-->
-
         <a class="nav-link" href="{% url 'logout' %}" target="__blank">Logout</a>
 </nav>

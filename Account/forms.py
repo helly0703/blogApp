@@ -6,6 +6,10 @@ from .models import Account
 
 # User Registration form
 class UserRegisterForm(UserCreationForm):
+    """
+    Form for user registration
+    Used form provided by django
+    """
     email = forms.EmailField()
 
     class Meta:
@@ -15,6 +19,9 @@ class UserRegisterForm(UserCreationForm):
 
 # User Updation form
 class UserUpdateForm(forms.ModelForm):
+    """
+    Form to update user model fields
+    """
     email = forms.EmailField()
 
     class Meta:
@@ -29,6 +36,9 @@ class DateInput(forms.DateInput):
 
 # Account Update form
 class AccountUpdateForm(forms.ModelForm):
+    """
+    Form to update account details
+    """
 
     class Meta:
         model = Account
@@ -40,7 +50,10 @@ class AccountUpdateForm(forms.ModelForm):
 
 
 class AccountSettingsForm(forms.ModelForm):
+    """
+    Form to update settings
+    """
 
     class Meta:
         model = Account
-        fields = ['privacy_mode','allow_notification']
+        fields = ['privacy_mode', 'allow_notification']
