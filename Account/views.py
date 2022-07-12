@@ -9,11 +9,11 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from blogs.models import Post
 from .forms import UserRegisterForm, AccountSettingsForm
-from django.contrib.auth.decorators import login_required
 from Account.forms import UserUpdateForm, AccountUpdateForm
 from .models import Account, Relationship
 from django.db.models import Q
 from blogs.models import Category
+from django.contrib.auth.views import LoginView
 
 
 class SignUpView(SuccessMessageMixin, CreateView):

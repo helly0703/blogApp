@@ -4,7 +4,13 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import Account
 
 
+
+class DateInput(forms.DateInput):
+    input_type = 'date'
+
+
 # User Registration form
+
 class UserRegisterForm(UserCreationForm):
     """
     Form for user registration
@@ -17,6 +23,7 @@ class UserRegisterForm(UserCreationForm):
         fields = ['username', 'email', 'password1', 'password2']
 
 
+
 # User Updation form
 class UserUpdateForm(forms.ModelForm):
     """
@@ -27,11 +34,6 @@ class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['username', 'email']
-
-
-# For date input as calendar
-class DateInput(forms.DateInput):
-    input_type = 'date'
 
 
 # Account Update form

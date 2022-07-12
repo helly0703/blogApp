@@ -17,6 +17,32 @@
                             <img style="width: 245px; height: 247px;" alt="Image description"
                                  src="{{ user.account.image.url }}"/>
                             <h3>{{ object.name }}</h3>
+                                {% if object in user.account.check_received_request %}
+                                    {% csrf_token%}
+                                    <button id="accept-frnd" type="button" class="btn btn-primary"
+                                            value="{{ object.id }}">Accept
+                                        Friend Request</button>
+
+                                    <button id="reject-frnd" type="button" class="btn btn-primary"
+                                            value="{{ object.id }}">Remove
+                                        from Friend
+                                        Request</button>
+
+                                {% elif object in user.account.check_send_request %}
+                                    <button class="btn btn-primary" disabled>Waiting for response</button>
+
+                                {% elif object.get_user not in user.account.friendslist.all %}
+                                    {% csrf_token%}
+                                    <button id="add-frnd" type="button" class="btn btn-primary"
+                                            value="{{ object.id }}">Add friend</button>
+
+                                {% else%}
+                                    {% csrf_token%}
+                                    <button id="remove-frnd" type="button" class="btn btn-primary"
+                                            value="{{ object.id}}">Remove from friends</button>
+
+                                {% endif %}
+
                         </div>
                     </div>
                 </div>
@@ -53,41 +79,6 @@
                             </table>
                         </div>
                     </div>
-                    {%if object in user.account.check_received_request%}
-
-                        <form action="{% url 'accept_request' %}" method="post">
-                            {% csrf_token%}
-                            <input type="hidden" name="profile_pk" value="{{ object.id}}">
-                            <button type="submit" class="btn btn-primary pull-right">Accept Friend Request</button>
-                        </form>
-
-                        <form action="{% url 'remove_request' %}" method="post">
-                            {% csrf_token%}
-                            <input type="hidden" name="profile_pk" value="{{ object.id }}">
-                            <button type="submit" class="btn btn-primary pull-right">Remove from Friend Request</button>
-                        </form>
-
-
-                    {%elif object in user.account.check_send_request%}
-                        <button class="btn btn-primary pull-right" disabled>Waiting for response</button>
-
-                    {% elif object.get_user not in user.account.friendslist.all %}
-                        <form id="add-friend">
-                            {% csrf_token%}
-                            <input type="hidden" name="profile_pk" class="user_id" id="user_id" value="{{ object.id }}">
-                            <button id="add-frnd" type="button" class="btn btn-primary pull-right"
-                                    value="{{ object.id }}">Add friend</button>
-                        </form>
-
-                    {% else%}
-
-                    <button id="remove-frnd" type="button" class="btn btn-primary pull-right" value="{{ object.id}}">Remove from
-                        friends</button>
-                    <form>
-                        {% csrf_token%}
-                    </form>
-
-                    {% endif %}
                     {% for post in object.get_all_authors_posts %}
                     {% if post.author in user.account.friendslist.all or post.author == user %}
                         <div class="card gedf-card">
@@ -111,7 +102,7 @@
                                                   <button type="submit" class="btn btn-secondary btn-xs"><i
                                                           class="fa fa-thumbs-o-up"></i> Unsave</button>
                                                 {% else %}
-                                                  <button type="submit" class="btn btn-default btn-xs"><i class="fa fa-thumbs-o-up"></i>
+                                                  <button type="submit" class="btn btn-default btn-xs">
                                                       Save</button>
                                                 {% endif %}
                                             </form>
@@ -207,7 +198,7 @@ $("#add-frnd").click(function() {
     event.preventDefault();
     $.ajax({
       type: "POST",
-      url: "{% url 'send_invite' %}",
+      url: "{% url 'accept_request' %}",
       data: {
         'profile_pk': user,
         },
@@ -223,7 +214,7 @@ $("#add-frnd").click(function() {
     event.preventDefault();
     $.ajax({
       type: "POST",
-      url: "{% url 'send_invite' %}",
+      url: "{% url 'remove_request' %}",
       data: {
         'profile_pk': user,
         },

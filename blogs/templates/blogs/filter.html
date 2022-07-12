@@ -1,19 +1,48 @@
-{% extends 'blogs/base.html' %}
-{%block title%}Posts{%endblock title%}
+{% for post in posts %}
+    <div class="card gedf-card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="mr-2">
+                        <img class="rounded-circle" width="45" src="{{ post.author.account.image.url }}" alt="">
+                    </div>
+                    <div class="ml-2">
+                        <div class="h5 m-0">{{ post.author }}</div>
+                        <div class="h7 text-muted">{{post.author.account.description}}</div>
+                    </div>
+                </div>
+                <div>
+                    <div class="dropdown">
+                        {% csrf_token %}
+                        {% if user.account in post.saved.all %}
+                          <button type="button" value="{{post.id}}" class="btn btn-secondary btn-xs save-button">
+                              Unsave</button>
+                        {% else %}
+                          <button type="button" value="{{post.id}}" class="btn btn-default btn-xs save-button">Save
+                          </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="text-muted h7 mb-2"> <i class="fa fa-clock-o"></i>{{ post.date_posted  }}</div>
+                <a class="card-link" href="{% url 'blog-post' post.id %}">
+                <h2 class="card-title">{{ post.title }}</h2></a>
+            {%if post.image.url != None%}
+                <img class="img-fluid" height="" width="" src="{{ post.image.url }}" alt="">
+            {%endif%}
 
-{% block content %}
-    <form action="{% url 'category-list'%}" name="filter-blog" id="filter-blog" method="GET">
-        {% csrf_token%}
-        <select id="category-id" name="category-id">
-        {% for category in object_list %}
-            <option value="{{ category }}">
-            {{ category }}
-            </option>
-        {% endfor %}
-        </select>
-        <input type="submit" value="Categories" id="Categories" name='Categories'>
-    </form>
 
-{% endblock content %}
-{% block script%}
-{%endblock script%}
+            <p style="font-size:20px">
+                {{ post.content|truncatewords:60  }}
+            </p>
+            <p>
+                {{ post.num_of_likes }} Likes
+            </p>
+            <a type="btn btn-secondary" href="{% url 'blog-post' post.id %}">
+                <h3 class="">Read More</h3>
+            </a>
+        </div>
+    </div>
+{% endfor %}

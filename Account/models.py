@@ -49,7 +49,7 @@ class Account(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(default=' ', max_length=50)
     image = models.ImageField(default='default.jpg', upload_to='profile_pics/')
-    birthday = models.DateField(null=True, default=date(2022, 3, 12))
+    birthday = models.DateField(null=True, blank=True)
     gender = models.CharField(null=True,
                               max_length=6,
                               choices=[('MALE', 'MALE'), ('FEMALE', 'FEMALE')],
@@ -78,6 +78,14 @@ class Account(models.Model):
             output_size = (300, 300)
             img.thumbnail(output_size)
             img.save(self.image.path)
+
+    def get_user_public(self):
+        public_accounts = Account.objects.filter(privacy_mode='PUBLIC')
+        public_users = []
+        for account in public_accounts:
+            user = User.objects.get(pk=account.user_id)
+            public_users.append(user)
+        return public_users
 
     def get_friends(self):
         # to get list of profile of all friends

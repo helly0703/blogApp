@@ -10,12 +10,15 @@ from .views import (
     SavedPostListView,
     PostSaveView,
     PostFilterView,
-    CategoryListView
+    CategoryListView,
+    SearchBlogView
 )
 
 
 urlpatterns = [
     path('', HomeView.as_view(), name="blogs"),
+
+    path('blogpost/search/', SearchBlogView.as_view(), name="search_post"),
     path('blogpost/new/', PostCreateView.as_view(), name="post-create"),
     path('blogpost/<int:pk>/', PostDetailView.as_view(), name="blog-post"),
     path('blogpost/<int:pk>/update/', PostUpdateView.as_view(), name='post-update'),

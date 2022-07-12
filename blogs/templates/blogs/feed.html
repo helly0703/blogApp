@@ -3,18 +3,41 @@
 
 {% block content %}
 <div class="card gedf-card">
-    <form action="{% url 'category-list'%}" name="filter-blog" id="filter-blog" method="GET">
-        {% csrf_token%}
-        <select id="category-id" name="category-id">
-            {% for category in categories %}
-            <option value="{{ category }}">
-                {{ category }}
-            </option>
-            {% endfor %}
-        </select>
-        <input type="submit" value="Categories" id="Categories" name='Categories'>
-    </form>
+    <table>
+        <tr>
+            <td>
+                <form action="{% url 'category-list'%}" name="filter-blog" id="filter-blog" method="GET">
+                {% csrf_token%}
+                    <select id="category-id" name="category-id">
+                        <option value="" selected>Select Category</option>
+                        {% for category in categories %}
+                            {% if category.name == selected_category %}
+                                <option value="{{ category }}" id="{{category}}" selected>
+                                    {{ category }}
+                                </option>
+                            {% else %}
+                                <option value="{{ category }}" id="{{category}}">
+                                    {{ category }}
+                                </option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <input type="submit" value="submit" id="Categories" name='Categories'>
+                </form>
+            </td>
+            <td>
+                <form action="{% url 'search_post' %}" name="search-post" id="search-post" method="get">
+                    {% csrf_token%}
+                    <span class="fa fa-search form-control-feedback">
+                        <input type="text" id="search_field" name="search_field" >
+                    </span>
+                </form>
+            </td>
+        </tr>
+    </table>
+
 </div>
+
 <div class="card gedf-card">
     <div class="card-header">
         <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
@@ -25,6 +48,7 @@
     </div>
 </div>
 <br>
+<div class="post-view">
 {% for post in posts %}
     <div class="card gedf-card">
         <div class="card-header">
@@ -73,6 +97,7 @@
         </div>
     </div>
 {% endfor %}
+</div>
 {% if posts%}
 {% if is_paginated %}
 <div class="pagination">
@@ -111,6 +136,7 @@ $(document).ready(function () {
          "X-CSRFToken": $('[name=csrfmiddlewaretoken]').val()
        }
    });
+
    $("button").click(function() {
     var post = $(this).val()
     event.preventDefault();
@@ -120,7 +146,7 @@ $(document).ready(function () {
       data: {
         'post_id': post, // from form
         },
-       success:  function () {        // Getting msg from the view
+       success:  function (context) {        // Getting msg from the view
         location.reload();
        },
     });

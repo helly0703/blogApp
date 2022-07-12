@@ -18,14 +18,15 @@
                 </div>
                 <div>
                     <div class="dropdown">
-                       <form action="{% url 'save-post'%}" method="post">
+                       <form>
                             {% csrf_token%}
                             <input type="hidden" name="post_id" value="{{post.id}}">
                             {% if user.account in post.saved.all %}
-                              <button type="submit" class="btn btn-secondary btn-xs"><i
-                                      class="fa fa-thumbs-o-up"></i> Unsave</button>
+                              <button type="button" id="save-post" class="btn btn-secondary btn-xs" value="{{post.id}}"><i
+                                      class="fa fa-thumbs-o-up" ></i> Unsave</button>
                             {% else %}
-                              <button type="submit" class="btn btn-default btn-xs"><i class="fa fa-thumbs-o-up"></i>
+                              <button type="button" id="save-post"  class="btn btn-default btn-xs" value="{{post.id}}"><i
+                                      class="fa fa-thumbs-o-up" ></i>
                                   Save</button>
                             {% endif %}
                         </form>
@@ -75,3 +76,33 @@
 
 {% endblock content %}
 
+{% block scripts%}
+<script>
+$(document).ready(function () {
+  $.ajaxSetup({
+       headers: {
+         "X-CSRFToken": $('[name=csrfmiddlewaretoken]').val()
+       }
+   });
+
+$("#save-post").click(function() {
+    console.log('Start')
+    var post = $(this).val()
+    console.log(post)
+    event.preventDefault();
+    $.ajax({
+      type: "POST",
+      url: "{% url 'save-post'%}",
+      data: {
+        'post_id': post, // from form
+        },
+       success:  function (context) {        // Getting msg from the view
+        location.reload();
+       },
+    });
+    return false;
+  });
+
+ });
+</script>
+{% endblock scripts %}
