@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.db.models.signals import post_save
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse_lazy
 from django.views import View
@@ -13,7 +14,7 @@ from Account.forms import UserUpdateForm, AccountUpdateForm
 from .models import Account, Relationship
 from django.db.models import Q
 from blogs.models import Category
-from django.contrib.auth.views import LoginView
+from .signals import update_profile
 
 
 class SignUpView(SuccessMessageMixin, CreateView):
@@ -21,6 +22,15 @@ class SignUpView(SuccessMessageMixin, CreateView):
     success_url = reverse_lazy('login')
     form_class = UserRegisterForm
     success_message = "Your profile was created successfully"
+
+    def post(self, request, *args, **kwargs):
+        user_form = UserRegisterForm(request.POST)
+        if user_form.is_valid():
+            user = user_form.save()
+            print(f"USER {user}")
+        birth = request.POST['birthdate']
+        update_profile(self.__class__, birth, user)
+        return redirect('login')
 
 
 class HomeView(LoginRequiredMixin, View):
@@ -161,7 +171,7 @@ class ProfileListView(ListView):
 class SendInviteView(LoginRequiredMixin, View):
     def post(self, request):
         pk = self.request.POST.get('profile_pk')
-        print(f"PK {pk}")
+        # print(f"PK {pk}")
         user = self.request.user
         sender = Account.objects.get(user=user)
         receiver = Account.objects.get(pk=pk)
