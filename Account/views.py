@@ -107,7 +107,6 @@ class FriendDetailView(LoginRequiredMixin, DetailView):
         print(f"context_searched     {context_searched}")
         print(f"context     {context}")
         print(f"kwargs     {kwargs}")
-
         # searches = SearchHistory.objects.get_or_create(searched_by=self.request.user.account,
         #                                                context_searched=context_searched)
         try:
@@ -116,7 +115,7 @@ class FriendDetailView(LoginRequiredMixin, DetailView):
             searches.timestamp = datetime.today()
             searches.save()
             return context
-        except:
+        except 'CREATE':
             searches = SearchHistory.objects.create(searched_by=self.request.user.account,
                                                     context_searched=context_searched)
             return context
