@@ -110,13 +110,16 @@ class FriendDetailView(LoginRequiredMixin, DetailView):
 
         # searches = SearchHistory.objects.get_or_create(searched_by=self.request.user.account,
         #                                                context_searched=context_searched)
-        searches = SearchHistory.objects.get(searched_by=self.request.user.account, context_searched=context_searched)
-        if searches:
+        try:
+            searches = SearchHistory.objects.get(searched_by=self.request.user.account,
+                                                 context_searched=context_searched)
             searches.timestamp = datetime.today()
             searches.save()
-        else:
-            searches = SearchHistory.objects.create(searched_by=self.request.user.account, context_searched=context_searched)
-        return context
+            return context
+        except:
+            searches = SearchHistory.objects.create(searched_by=self.request.user.account,
+                                                    context_searched=context_searched)
+            return context
 
 
 class InvitesReceivedView(LoginRequiredMixin, ListView):
@@ -162,14 +165,13 @@ class InvitesProfileListView(LoginRequiredMixin, ListView):
     #     qs = Account.objects.get_all_profiles_to_invites(user)
     #     return qs
     def get_queryset(self):
-        user=self.request.user.account
+        user = self.request.user.account
         searched_users = SearchHistory.objects.filter(searched_by=user).order_by('-timestamp')[:15]
         qs = []
         for a_user in searched_users:
             qs.append(a_user.context_searched)
             # print(f"sndjkandjkadfjfmkmfkmkafm{a_user.context_searched}")
         return qs
-
 
 
 class ProfileListView(ListView):
@@ -279,4 +281,3 @@ class MyBlogsView(LoginRequiredMixin, ListView):
         context['posts'] = Post.objects.filter(author=user)
         context['categories'] = Category.objects.all()
         return context
-
