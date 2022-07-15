@@ -10,22 +10,15 @@ from django.core.signals import request_finished
 # To create account instance
 @receiver(post_save, sender=User)
 def create_profile(sender, instance, created, **kwargs):
-    print("Done")
-    print(kwargs)
     if created:
         Account.objects.create(user=instance)
 
-# @receiver(post_save)
-def update_profile(sender, birthdate,username, **kwargs):
-    print(f"user{username}")
-    print(f"KWARGS {birthdate}")
+
+def update_profile(sender, birthdate, username, **kwargs):
     user = User.objects.get(username=username)
     account = Account.objects.get(user=user)
     account.birthday = birthdate
     account.save()
-    print(account)
-
-        # Account.objects.create(user=instance)
 
 
 # To save account instance

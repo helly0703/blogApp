@@ -172,3 +172,14 @@ class Relationship(models.Model):
 
     def __str__(self):
         return f'{self.sender}'
+
+#
+class SearchHistory(models.Model):
+    searched_by = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='searched_by')
+    context_searched = models.ForeignKey(Account,on_delete=models.CASCADE, related_name='context_searched')
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.searched_by}'
+
+

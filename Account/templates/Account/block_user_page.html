@@ -1,0 +1,89 @@
+{% extends 'Account/home_base.html' %}
+{% load static %}
+{% block content %}
+{% load crispy_forms_tags %}
+    {% if user.is_authenticated %}
+    <a href="javascript:history.go(-1)" class="btn btn-outline-secondary">Back</a>
+        <div class="container">
+            <br>
+            {% for object in user.account.get_blocklist %}
+                <div class="row">
+                  <div class="col-md-2 col-sm-2">
+                    <img src="{{ object.account.image.url }}" alt="user" height="50px"
+                         width="50px" style="border-radius:50%; padding:5px">
+                  </div>
+                  <div class="col-md-7 col-sm-7">
+                    <h5><a href="{% url 'friend_detail' object.account.id %}" class="profile-link">{{ object.username }}</a>
+
+                    </h5>
+                  </div>
+                  <div class="col-md-3 col-sm-3">
+                          {% csrf_token%}
+                      <table>
+                          <tr>
+                              <td><button type="button" id="remove-frnd" class="btn btn-primary"
+                                    value="{{ object.account.id }}">Unblock User</button></td>
+                              <td><button type="button" id="block-frnd" value="{{ object.id }}"
+                                    class="btn btn-primary pull-right">Unblock and add Friend</button></td>
+                          </tr>
+                      </table>
+                  </div>
+                </div>
+            <br>
+            {% endfor%}
+        </div>
+    {% else %}
+        <small class="text-muted"><a href="{% url 'login' %}" class="ml-2">Login</a></small>
+    {% endif %}
+{% endblock content %}
+{% block scripts%}
+<script>
+$(document).ready(function(){
+window.onload = function() {
+	if(!window.location.hash) {
+		window.location = window.location;
+		window.location.reload();
+	}
+};
+console.log('Hey');
+$.ajaxSetup({
+       headers: {
+         "X-CSRFToken": $('[name=csrfmiddlewaretoken]').val()
+       }
+   });
+$("#remove-frnd").click(function() {
+    var user = $(this).val()
+    event.preventDefault();
+    $.ajax({
+      type: "POST",
+      url: "{%url 'remove_friend' %}",
+      data: {
+        'profile_pk': user,
+        },
+      success:  function () {
+        console.log('Success');
+        location.reload();
+       },
+    });
+    return false;
+  });
+  $("#block-frnd").click(function() {
+    var user = $(this).val()
+    event.preventDefault();
+    $.ajax({
+      type: "POST",
+      url: "{%url 'block_profile' %}",
+      data: {
+        'profile_pk': user,
+        },
+      success:  function () {
+        console.log('Success');
+        location.reload();
+       },
+    });
+    return false;
+  });
+});
+</script>>
+{% endblock scripts%}
+

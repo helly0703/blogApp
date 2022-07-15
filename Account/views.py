@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models.signals import post_save
@@ -11,7 +13,7 @@ from django.contrib.auth.models import User
 from blogs.models import Post
 from .forms import UserRegisterForm, AccountSettingsForm
 from Account.forms import UserUpdateForm, AccountUpdateForm
-from .models import Account, Relationship
+from .models import Account, Relationship, SearchHistory
 from django.db.models import Q
 from blogs.models import Category
 from .signals import update_profile
@@ -90,9 +92,31 @@ class FriendView(LoginRequiredMixin, ListView):
     template_name = 'Account/friendspage.html'
 
 
+class BlockedUserView(LoginRequiredMixin, ListView):
+    model = Account
+    template_name = 'Account/block_user_page.html'
+
+
 class FriendDetailView(LoginRequiredMixin, DetailView):
     model = Account
     template_name = 'Account/friend-detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context_searched = context['account']
+        print(f"context_searched     {context_searched}")
+        print(f"context     {context}")
+        print(f"kwargs     {kwargs}")
+
+        # searches = SearchHistory.objects.get_or_create(searched_by=self.request.user.account,
+        #                                                context_searched=context_searched)
+        searches = SearchHistory.objects.get(searched_by=self.request.user.account, context_searched=context_searched)
+        if searches:
+            searches.timestamp = datetime.today()
+            searches.save()
+        else:
+            searches = SearchHistory.objects.create(searched_by=self.request.user.account, context_searched=context_searched)
+        return context
 
 
 class InvitesReceivedView(LoginRequiredMixin, ListView):
@@ -133,10 +157,19 @@ class InvitesProfileListView(LoginRequiredMixin, ListView):
     template_name = 'Account/to_invite_list.html'
     context_object_name = 'qs'
 
+    # def get_queryset(self):
+    #     user = self.request.user
+    #     qs = Account.objects.get_all_profiles_to_invites(user)
+    #     return qs
     def get_queryset(self):
-        user = self.request.user
-        qs = Account.objects.get_all_profiles_to_invites(user)
+        user=self.request.user.account
+        searched_users = SearchHistory.objects.filter(searched_by=user).order_by('-timestamp')[:15]
+        qs = []
+        for a_user in searched_users:
+            qs.append(a_user.context_searched)
+            # print(f"sndjkandjkadfjfmkmfkmkafm{a_user.context_searched}")
         return qs
+
 
 
 class ProfileListView(ListView):
@@ -209,6 +242,7 @@ class SearchProfileView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         query = self.request.GET.get("search_field")
+        print(query)
         qs = Account.objects.filter(
             Q(name__icontains=query) | Q(user__username__icontains=query)
         ).exclude(name=self.request.user.account.name)
@@ -245,3 +279,4 @@ class MyBlogsView(LoginRequiredMixin, ListView):
         context['posts'] = Post.objects.filter(author=user)
         context['categories'] = Category.objects.all()
         return context
+

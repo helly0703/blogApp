@@ -19,6 +19,7 @@ from Account.views import (
     SettingsFormView,
     BlockUserCreateView,
     MyBlogsView,
+    BlockedUserView
 )
 from notifications.views import NotificationsListView
 
@@ -29,6 +30,7 @@ urlpatterns = [
     path('home/update-profile/', UpdateProfileView.as_view(), name='profile'),
     path('home/profile/settings/', SettingsFormView.as_view(), name='settings'),
     path('home/friends/', FriendView.as_view(), name='friends_page'),
+    path('home/friends/blocked', BlockedUserView.as_view(), name='block_user_page'),
     path('home/friends/<int:pk>/', FriendDetailView.as_view(), name='friend_detail'),
     path('home/my-invites/', InvitesReceivedView.as_view(), name='my_invites'),
     path('home/all-profiles/', ProfileListView.as_view(), name='all_profiles'),

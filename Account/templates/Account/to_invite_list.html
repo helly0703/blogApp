@@ -11,8 +11,8 @@ Add Friends
             <br>
             <form action="{% url 'search_profile' %}" name="search-profile" id="search-profile" method="get">
                 {% csrf_token%}
-                <span class="fa fa-search form-control-feedback">
-                    <input type="text" id="search_field" name="search_field" >
+                <span class="fa fa-search form-control-feedback" style="padding-left:40%">
+                   <input type="text"  id="search_field" name="search_field">
                 </span>
             </form>
             <br>

@@ -1,4 +1,15 @@
 let input_message = $('#input-message')
+//let input_file = $('#input-file')
+//let reader = new FileReader
+//reader.readAsBinaryString(input_file);
+//console.log()
+//console.log(input_file.src)
+//let blob = input_file.getAsFile();
+//let new_file = convertFileToBase64viaFileReader(input_file, function(dataUrl){
+//    // Base64DataURL
+//    console.log('RESULT:', dataUrl)
+//});
+//console.log(input_file)
 let message_body = $('#msg_card_body')
 let send_message_form = $('#send-message-form')
 const USER_ID = $('#logged-in-user').val()
@@ -18,14 +29,48 @@ let endpoint = wsStart + loc.host + loc.pathname
 // creating new Websocket object and endpoint is the url
 var socket = new WebSocket(endpoint)
 
+
+////Convert media object to base64(Binary)
+//function convertFileToBase64viaFileReader(url, callback){
+//    var xhr = new XMLHttpRequest();
+//    xhr.responseType = 'blob';
+//    xhr.onload = function() {
+//      var reader  = new FileReader();
+//      reader.onloadend = function () {
+//          callback(reader.result);
+//      }
+//      reader.readAsDataURL(xhr.response);
+//    };
+//    xhr.open('GET', url);
+//    xhr.send();
+//}
+//
+//convertFileToBase64viaFileReader(input_file, function(dataUrl){
+//    // Base64DataURL
+//    new_file = dataUrl
+//    console.log('RESULT:', dataUrl)
+//});
+
+
+
 socket.onopen = async function(e){
     console.log('open',e);
     send_message_form.on('submit',function(e){
         e.preventDefault()
+//        let file_ = input_file
+//        let file_type = typeof(file_)
+//        console.log(new_file)
+//        console.log(input_file)
+//        console.log('jbnjkdsjk')
+//        console.log(file_type)
+//        let file = getBase64(file_);
+//        files_name = file.file.name()
+
         let message = input_message.val()
         let send_to = get_active_other_user_id();
         let thread_id = get_active_thread_id()
         let data = {
+//            'new_file': new_file,
             'message': message,
             'sent_by': USER_ID,
             'send_to': send_to,
@@ -41,7 +86,12 @@ socket.onopen = async function(e){
 socket.onmessage = async function(e){
     console.log('message',e);
     let data = JSON.parse(e.data)
+//    console.log(data['file_obj']);
+//    console.log()
     console.log(data['message']);
+//    console.log(data['files']);
+//    console.log(data['file_name']);
+
     let message = data['message']
     let sent_by_id = data['sent_by']
     let thread_id = data['thread_id']
@@ -123,3 +173,6 @@ function get_active_thread_id(){
     return thread_id
  }
 
+$(document).ready(function(){
+
+})
