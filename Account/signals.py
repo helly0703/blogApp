@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.db.models.signals import post_save, pre_delete
 from django.contrib.auth.models import User
 from django.dispatch import receiver
@@ -41,8 +42,15 @@ def post_save_add_to_friends(sender, instance, created, **kwargs):
                                                      message=sender_message)
         receiver_notify = Notifications.objects.create(to_user=receiver_.user.account, category='Newfriends',
                                                        message=receiver_message)
-        create_thread = Thread.objects.create(first_person=sender_.user, second_person=receiver_.user)
-        create_thread.save()
+        try:
+            existing_thread = Thread.objects.get(Q(first_person=sender_.user,second_person=receiver_.user) | Q(first_person=receiver_.user,second_person=sender_.user))
+            if existing_thread:
+                existing_thread.user_blocked = False
+                existing_thread.save()
+        except Exception as e:
+            create_thread = Thread.objects.create(first_person=sender_.user, second_person=receiver_.user)
+
+            create_thread.save()
         sender_notify.save()
         receiver_notify.save()
         sender_.save()

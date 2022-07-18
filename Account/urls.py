@@ -19,7 +19,8 @@ from Account.views import (
     SettingsFormView,
     BlockUserCreateView,
     MyBlogsView,
-    BlockedUserView
+    BlockedUserView,
+    UnblockUserView
 )
 from notifications.views import NotificationsListView
 
@@ -38,6 +39,7 @@ urlpatterns = [
     path('home/block-profile/', BlockUserCreateView.as_view(), name='block_profile'),
     path('home/invite-profiles/', InvitesProfileListView.as_view(), name='invite_profiles'),
     path('home/send-invite/', SendInviteView.as_view(), name='send_invite'),
+    path('home/unblock-friend/', UnblockUserView.as_view(), name='unblock_friend'),
     path('home/remove-friend/', RemoveFriendView.as_view(), name='remove_friend'),
     path('home/my-blogs/', MyBlogsView.as_view(), name='my_blogs'),
     path('home/accept-request/', AcceptInvitesView.as_view(), name='accept_request'),

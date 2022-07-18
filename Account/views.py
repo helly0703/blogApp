@@ -11,6 +11,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import User
 from blogs.models import Post
+from chat.models import Thread
 from .forms import UserRegisterForm, AccountSettingsForm
 from Account.forms import UserUpdateForm, AccountUpdateForm
 from .models import Account, Relationship, SearchHistory
@@ -116,8 +117,8 @@ class FriendDetailView(LoginRequiredMixin, DetailView):
             searches.timestamp = datetime.today()
             searches.save()
             return context
-        except 'CREATE':
-            searches = SearchHistory.objects.create(searched_by=self.request.user.account,
+        except Exception as e:
+            SearchHistory.objects.create(searched_by=self.request.user.account,
                                                     context_searched=context_searched)
             return context
 
@@ -217,10 +218,40 @@ class SendInviteView(LoginRequiredMixin, View):
             if block_user in sender.blockedlist.all():
                 sender.blockedlist.remove(block_user)
             Relationship.objects.create(sender=sender, receiver=receiver, status='accepted')
+            thread = Thread.objects.get(Q(first_person=user, second_person=block_user) | Q(first_person=block_user,
+                                                                                         second_person=user))
+            if thread:
+                thread.user_blocked = False
+                thread.save()
+
         else:
             if block_user in sender.blockedlist.all():
                 sender.blockedlist.remove(block_user)
             Relationship.objects.create(sender=sender, receiver=receiver, status='send')
+            thread = Thread.objects.get(
+                Q(first_person=user, second_person=block_user) | Q(first_person=block_user, second_person=user))
+            if thread:
+                thread.user_blocked = False
+                thread.save()
+        msg = 'Success'
+        return HttpResponse(msg)
+
+
+class UnblockUserView(LoginRequiredMixin, View):
+    def post(self, request):
+        pk = self.request.POST.get('profile_pk')
+        # print(f"PK {pk}")
+        user = self.request.user
+        sender = Account.objects.get(user=user)
+        receiver = Account.objects.get(pk=pk)
+        block_user = User.objects.get(pk=receiver.user_id)
+
+        if receiver.privacy_mode == 'PUBLIC':
+            if block_user in sender.blockedlist.all():
+                sender.blockedlist.remove(block_user)
+        else:
+            if block_user in sender.blockedlist.all():
+                sender.blockedlist.remove(block_user)
         msg = 'Success'
         return HttpResponse(msg)
 
@@ -247,7 +278,7 @@ class SearchProfileView(LoginRequiredMixin, ListView):
         query = self.request.GET.get("search_field")
         print(query)
         qs = Account.objects.filter(
-            Q(name__icontains=query) | Q(user__username__icontains=query)
+            Q(user__username__icontains=query) | Q(name__icontains=query)
         ).exclude(name=self.request.user.account.name)
         return qs
 
@@ -258,6 +289,10 @@ class BlockUserCreateView(LoginRequiredMixin, View):
         user = self.request.user
         blocked_by = Account.objects.get(user=user)
         block_user = User.objects.get(pk=pk)
+        thread = Thread.objects.get(Q(first_person=user, second_person=block_user) | Q(first_person=block_user,
+                                                                                          second_person=user))
+        thread.user_blocked = True
+        thread.save()
         blocked_by.blockedlist.add(block_user)
         if block_user in blocked_by.friendslist.all():
             blocked_by.friendslist.remove(block_user)

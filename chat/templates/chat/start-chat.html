@@ -48,11 +48,29 @@
                                             <div class="user_info">
                                                 {% if thread.first_person == user %}
                                                     <span>{{ thread.second_person.username }}</span>
+
+                                                    {% if thread.chatmessage_thread.last.user != user %}
+
+                                                        {% if thread.new_msg_flag%}
+                                                            <span id="new_message_{{ thread.id }}" class="new_message">
+                                                                <i class="fas fa-solid fa-bell"></i>
+                                                            </span>
+                                                        {% endif %}
+
+                                                    {% endif %}
+
                                                 {% else %}
                                                     <span>{{ thread.first_person.username }}</span>
-                                                {% endif %}
 
-    {#                                            <p>Kalid is online</p>#}
+                                                    {% if thread.chatmessage_thread.last.user != user %}
+                                                        {% if thread.new_msg_flag %}
+                                                            <span id="new_message_{{ thread.id }}" class="new_message">
+                                                                <i class="fas fa-solid fa-bell"></i>
+                                                            </span>
+
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endif %}
                                             </div>
                                         </div>
                                     </li>
@@ -73,26 +91,33 @@
                                         {% else %}
                                             {{ thread.first_person.id }}
                                         {% endif %}
-                                    ">
+                                    " >
                                 <div class="card-header msg_head">
-                                    <div class="d-flex bd-highlight">
-                                        <div class="img_cont">
-                                            <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
-                                            <span class="online_icon"></span>
-                                        </div>
-                                        <div class="user_info">
-                                            {% if thread.first_person == user %}
-                                                    <span>Chat with {{ thread.second_person.username }}</span>
-                                            {% else %}
-                                                <span>Chat with {{ thread.first_person.username }}</span>
-                                            {% endif %}
+                                    {% if thread.first_person == user %}
+                                        <div class="d-flex bd-highlight">
+                                            <div class="img_cont">
+                                                <img src="{{ thread.second_person.account.image.url }}"
+                                                     class="rounded-circle user_img">
+                                                <span class="online_icon"></span>
+                                            </div>
+                                            <div class="user_info">
+                                                <span>Chat with {{ thread.second_person.username }}</span>
+                                                <p>{{ thread.chatmessage_thread.all.count }} messages</p>
 
-                                            <p>{{ thread.chatmessage_thread.all.count }} messages</p>
-                                        </div>
-                                        <div class="video_cam">
-                                            <span><i class="fas fa-video"></i></span>
-                                            <span><i class="fas fa-phone"></i></span>
-                                        </div>
+                                            </div>
+                                        {% else %}
+                                            <div class="d-flex bd-highlight">
+                                            <div class="img_cont">
+                                                <img src="{{ thread.first_person.account.image.url }}"
+                                                     class="rounded-circle user_img">
+                                                <span class="online_icon"></span>
+                                            </div>
+                                            <div class="user_info">
+                                                <span>Chat with {{ thread.first_person.username }}</span>
+                                                <p>{{ thread.chatmessage_thread.all.count }} messages</p>
+
+                                            </div>
+                                        {% endif %}
                                     </div>
                                     <span id="action_menu_btn"><i class="fas fa-ellipsis-v"></i></span>
                                     <div class="action_menu">
@@ -140,15 +165,6 @@
 						<div class="card-footer">
 							<form id="send-message-form">
                                 <div class="input-group">
-                                    <div class="input-group-append">
-									    <span class="input-group-text attach_btn">
-                                            <label >
-<!--                                                <i class="fas fa-paperclip"></i>-->
-<!--                                                <input type="file" id="input-file" name="myfile" >-->
-
-                                            </label>
-                                        </span>
-                                    </div>
                                     <input type="text" name="" id="input-message" class="form-control type_msg"
                                            placeholder="Type your message..." >
 

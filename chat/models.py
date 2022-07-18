@@ -21,11 +21,13 @@ class Thread(models.Model):
                                       related_name='thread_second_person')
     updated = models.DateTimeField(auto_now=True)
     timestamp = models.DateTimeField(auto_now_add=True)
+    new_message_timestamp = models.DateTimeField(blank=True, null=True)
+    new_msg_flag = models.BooleanField(null=True,blank=True)
+    user_blocked = models.BooleanField(default=False)
 
     objects = ThreadManager()
     class Meta:
         unique_together = ['first_person', 'second_person']
-
 
 class ChatMessage(models.Model):
     thread = models.ForeignKey(Thread,null=True,blank=True,on_delete=models.CASCADE,related_name='chatmessage_thread')

@@ -1,3 +1,4 @@
+import datetime
 import json
 from channels.consumer import AsyncConsumer
 from channels.db import database_sync_to_async
@@ -91,6 +92,7 @@ class ChatConsumer(AsyncConsumer):
         qs = Thread.objects.filter(id=thread_id)
         if qs.exists():
             obj = qs.first()
+
         else:
             obj = None
         return obj
@@ -98,5 +100,11 @@ class ChatConsumer(AsyncConsumer):
     @database_sync_to_async
     def create_chat_message(self, thread, user, msg):
         ChatMessage.objects.create(thread=thread, user=user, message=msg)
+        new_msg = Thread.objects.get(id=thread.id)
+        chat = ChatMessage.objects.filter(thread=new_msg)
+        print(chat.last())
+        new_msg.new_message_timestamp = datetime.datetime.now()
+        new_msg.new_msg_flag = True
+        new_msg.save()
 
 # Next step route the path to this ChatConsumer

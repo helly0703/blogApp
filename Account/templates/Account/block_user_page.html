@@ -21,9 +21,9 @@
                           {% csrf_token%}
                       <table>
                           <tr>
-                              <td><button type="button" id="remove-frnd" class="btn btn-primary"
+                              <td><button type="button" id="unblock-frnd" class="btn btn-primary"
                                     value="{{ object.account.id }}">Unblock User</button></td>
-                              <td><button type="button" id="block-frnd" value="{{ object.id }}"
+                              <td><button type="button" id="unblock-add-frnd" value="{{ object.account.id }}"
                                     class="btn btn-primary pull-right">Unblock and add Friend</button></td>
                           </tr>
                       </table>
@@ -51,12 +51,12 @@ $.ajaxSetup({
          "X-CSRFToken": $('[name=csrfmiddlewaretoken]').val()
        }
    });
-$("#remove-frnd").click(function() {
+$("#unblock-frnd").click(function() {
     var user = $(this).val()
     event.preventDefault();
     $.ajax({
       type: "POST",
-      url: "{%url 'remove_friend' %}",
+      url: "{%url 'unblock_friend' %}",
       data: {
         'profile_pk': user,
         },
@@ -67,12 +67,12 @@ $("#remove-frnd").click(function() {
     });
     return false;
   });
-  $("#block-frnd").click(function() {
+  $("#unblock-add-frnd").click(function() {
     var user = $(this).val()
     event.preventDefault();
     $.ajax({
       type: "POST",
-      url: "{%url 'block_profile' %}",
+      url: "{%url 'send_invite' %}",
       data: {
         'profile_pk': user,
         },

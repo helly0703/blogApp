@@ -1,5 +1,6 @@
 let input_message = $('#input-message')
 let message_body = $('#msg_card_body')
+let notify_element = $('#new_message')
 let send_message_form = $('#send-message-form')
 const USER_ID = $('#logged-in-user').val()
 console.log('Start');
@@ -64,9 +65,13 @@ function newMessage(message, sent_by_id, thread_id){
         return false;
     }
     let message_element;
+    let notification;
     let chat_id = 'chat_' + thread_id
+    console.log('SENT ID', sent_by_id)
+    console.log('USER ID', USER_ID  )
     if (sent_by_id == USER_ID){
         console.log('Its the sender')
+
         message_element =`
             <div class="d-flex mb-4 replied">
                 <div class="msg_cotainer_send">
@@ -80,6 +85,9 @@ function newMessage(message, sent_by_id, thread_id){
         `
     }
     else{
+        notification = `
+        <i class="fas fa-solid fa-bell"></i>
+        `
          message_element =`
             <div class="d-flex mb-4 received">
                 <div class="img_cont_msg">
@@ -93,21 +101,40 @@ function newMessage(message, sent_by_id, thread_id){
         `
     }
     let message_body = $('.messages-wrapper[chat-id="' + chat_id + '"] .msg_card_body')
+    $('#new_message_'+thread_id).append($(notification))
     message_body.append($(message_element))
-    message_body.animate({ scrollTop: 2000 }, 3000);
+//    message_body.animate({ scrollTop: 2000 }, 3000);
     input_message.val(null);
 }
 
 
 
 $('.contact-li').on('click',function (){
+    console.log("Work")
     $('.contacts.active').removeClass('active')
     $(this).addClass('active')
+    let thread = get_active_thread_id()
 
+    let chat_id_ = $('.contact-li').attr('chat-id')
+    let thread_id = chat_id_.replace('chat_','')
+    let chat_id_new = 'chat_' + thread_id
+    $.ajax({
+        url: '/chat/view-msg/',
+        method: 'post',
+        data: {
+        'thread_id': thread,
+        success:function(){
+        let notify = $('#new_message_'+thread)
+        notify.html('');
+        }
+
+        },
+    });
     // message wrappers
     let chat_id = $(this).attr('chat-id')
     $('.messages-wrapper.is_active').removeClass('is_active')
     $('.messages-wrapper[chat-id="' + chat_id +'"]').addClass('is_active')
+
 })
 
 function get_active_other_user_id(){
