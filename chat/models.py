@@ -31,11 +31,4 @@ class ChatMessage(models.Model):
     thread = models.ForeignKey(Thread,null=True,blank=True,on_delete=models.CASCADE,related_name='chatmessage_thread')
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     message = models.TextField()
-    # my_file = models.FileField(upload_to='',null=True,blank=True)
-    # attached_file = models.ForeignKey(Uploads,null=True,blank=True,on_delete=models.CASCADE,
-    #                                   related_name='attached_file')
     timestamp = models.DateTimeField(auto_now_add=True)
-
-
-# class Uploads(models.Model):
-#     my_file = models.FileField(upload_to='')

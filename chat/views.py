@@ -1,9 +1,14 @@
+import json
+
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
 # Create your views here.
 from django.views import View
 from .models import Thread
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 
 
 class ChatHomeView(LoginRequiredMixin, View):
@@ -15,4 +20,4 @@ class ChatHomeView(LoginRequiredMixin, View):
             context = {
                 'Threads': threads
             }
-            return render(request, 'chat/start-chat.html',context)
+            return render(request, 'chat/start-chat.html', context)

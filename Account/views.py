@@ -110,13 +110,16 @@ class FriendDetailView(LoginRequiredMixin, DetailView):
 
         # searches = SearchHistory.objects.get_or_create(searched_by=self.request.user.account,
         #                                                context_searched=context_searched)
-        searches = SearchHistory.objects.get(searched_by=self.request.user.account, context_searched=context_searched)
-        if searches:
+        try:
+            searches = SearchHistory.objects.get(searched_by=self.request.user.account,
+                                                 context_searched=context_searched)
             searches.timestamp = datetime.today()
             searches.save()
-        else:
-            searches = SearchHistory.objects.create(searched_by=self.request.user.account, context_searched=context_searched)
-        return context
+            return context
+        except 'CREATE':
+            searches = SearchHistory.objects.create(searched_by=self.request.user.account,
+                                                    context_searched=context_searched)
+            return context
 
 
 class InvitesReceivedView(LoginRequiredMixin, ListView):
