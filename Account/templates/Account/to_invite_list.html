@@ -105,7 +105,7 @@ $.ajaxSetup({
          "X-CSRFToken": $('[name=csrfmiddlewaretoken]').val()
        }
    });
-$("#add-frnd").click(function() {
+$("#add-frnd").click(function(event) {
     var user = $(this).val()
     event.preventDefault();
     $.ajax({
@@ -121,7 +121,7 @@ $("#add-frnd").click(function() {
     });
     return false;
   });
-  $("#add-frnds").click(function() {
+  $("#add-frnds").click(function(event) {
     var user = $(this).val()
     event.preventDefault();
     $.ajax({
@@ -131,13 +131,12 @@ $("#add-frnd").click(function() {
         'profile_pk': user,
         },
       success:  function () {
-        console.log('Success');
         location.reload();
        },
     });
     return false;
   });
-  $("#remove-frnd").click(function() {
+  $("#remove-frnd").click(function(event) {
     console.log('Start');
     var user = $(this).val();
     console.log(user);

@@ -143,7 +143,7 @@ class AcceptInvitesView(LoginRequiredMixin, View):
         if rel.status == 'send':
             rel.status = 'accepted'
             rel.save()
-        return HttpResponse('Success')
+        return JsonResponse({'Success':'Success'})
 
 
 class RejectInvitesView(LoginRequiredMixin, View):
@@ -218,21 +218,21 @@ class SendInviteView(LoginRequiredMixin, View):
             if block_user in sender.blockedlist.all():
                 sender.blockedlist.remove(block_user)
             Relationship.objects.create(sender=sender, receiver=receiver, status='accepted')
-            thread = Thread.objects.get(Q(first_person=user, second_person=block_user) | Q(first_person=block_user,
-                                                                                         second_person=user))
-            if thread:
-                thread.user_blocked = False
-                thread.save()
+            # thread = Thread.objects.get(Q(first_person=user, second_person=block_user) | Q(first_person=block_user,
+            #                                                                              second_person=user))
+            # if thread:
+            #     thread.user_blocked = False
+            #     thread.save()
 
         else:
             if block_user in sender.blockedlist.all():
                 sender.blockedlist.remove(block_user)
             Relationship.objects.create(sender=sender, receiver=receiver, status='send')
-            thread = Thread.objects.get(
-                Q(first_person=user, second_person=block_user) | Q(first_person=block_user, second_person=user))
-            if thread:
-                thread.user_blocked = False
-                thread.save()
+                # thread = Thread.objects.get(
+                #     Q(first_person=user, second_person=block_user) | Q(first_person=block_user, second_person=user))
+                # if thread:
+                #     thread.user_blocked = False
+                #     thread.save()
         msg = 'Success'
         return HttpResponse(msg)
 
