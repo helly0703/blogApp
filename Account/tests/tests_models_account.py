@@ -26,6 +26,7 @@ def create_user2():
     new_account2.privacy_mode = "PRIVATE"
     new_account2.save()
 
+
 @pytest.mark.django_db
 class TestAccountModel:
 
@@ -168,8 +169,17 @@ class TestAccountModel:
         is_request_sent = new_account2.check_received_request()
         assert is_request_sent[0] == new_account1
 
-    def test_get_all_authors_posts(self):
-        pass
+
+
+    def test_all_profiles_to_invite(self, create_user1, create_user2):
+        new_user1 = User.objects.get(username="testuser1")
+        new_user1_id = new_user1.id
+        new_account1 = Account.objects.get(user_id=new_user1_id)
+        new_user2 = User.objects.get(username="testuser2")
+        new_user2_id = new_user2.id
+        new_account2 = Account.objects.get_all_profiles_to_invites(sender=new_user2_id)
+        assert new_account2[0] == new_account1
+
 
 
 
