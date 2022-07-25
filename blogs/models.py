@@ -46,7 +46,8 @@ class Post(models.Model):
         ordering = ('-date_posted',)
 
     def get_absolute_url(self):
-        return reverse('post-detail', kwargs={'pk': self.pk})
+        print("True")
+        return reverse('blog-post', kwargs={'pk': self.pk})
 
 
 class Category(models.Model):

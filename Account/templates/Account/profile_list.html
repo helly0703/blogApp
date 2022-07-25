@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
 {% load crispy_forms_tags %}
-    <form class="search-bar justify-content-start" action="{% url 'search-profile' %}" name="search-profile"
+    <form class="search-bar justify-content-start" action="{% url 'search_profile' %}" name="search-profile"
           id="search-profile" method="get">
 			<input type="text" class="form-control" name="search_field" id="search_field" placeholder="Search...">
     </form>
@@ -21,7 +21,7 @@
                   <div class="col-md-3 col-sm-3">
 
                     {% if object.user not in rel_receiver and object.user not in rel_sender and request.user not in object.friendslist.all%}
-                      <form action="{% url 'sendinvite' %}" method="post">
+                      <form action="{% url 'send_invite' %}" method="post">
                         {% csrf_token%}
                           <input type="hidden" name="profile_pk" value="{{ object.id }}">
                           <button type="submit" class="btn btn-primary pull-right">Add Friend</button>
@@ -33,7 +33,7 @@
                     {% endif %}
 
                     {% if request.user in  object.friendslist.all %}
-                        <form action="{%url 'removefriend' %}" method="post">
+                        <form action="{%url 'remove_friend' %}" method="post">
                           {% csrf_token%}
                             <input type="hidden" name="profile_pk" value="{{ object.id }}">
                             <button class="btn btn-primary pull-right">Remove from friends</button>

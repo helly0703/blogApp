@@ -20,7 +20,9 @@ urlpatterns = [
 
     path('blogpost/search/', SearchBlogView.as_view(), name="search_post"),
     path('blogpost/new/', PostCreateView.as_view(), name="post-create"),
+
     path('blogpost/<int:pk>/', PostDetailView.as_view(), name="blog-post"),
+
     path('blogpost/<int:pk>/update/', PostUpdateView.as_view(), name='post-update'),
     path('blogpost/filter/', CategoryListView.as_view(), name='filter-blog'),
     path('blogpost/filter-posts/', PostFilterView.as_view(), name='category-list'),

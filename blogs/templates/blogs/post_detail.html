@@ -64,20 +64,20 @@
           </div>
           <div class="box-footer box-comments" style="display: block; background-color:#f7f7f7;">
             {% for comment in post.get_comments%}
-            <div class="box-comment" style="padding-top:3px">
-              <span>
-                <img class="rounded-circle" src="{{ comment.user.user.account.image.url }}" alt="User Image"
-                      height="20px"
-                   width="20px">
-              </span>
-              <span class="username">
-              {{ comment.user.user.username}}
-              <span class="text-muted pull-right">{{ comment.created }}</span>
-              </span>
-              <span class="text-muted" style="padding-left:5px">{{ comment.body }}</span>
-              </span>
-              <br>
-            </div>
+              <div class="box-comment" style="padding-top:3px">
+                <span>
+                  <img class="rounded-circle" src="{{ comment.user.user.account.image.url }}" alt="User Image"
+                        height="20px"
+                     width="20px">
+                </span>
+                <span class="username">
+                {{ comment.user.user.username}}
+                <span class="text-muted pull-right">{{ comment.created }}</span>
+                </span>
+                <span class="text-muted" style="padding-left:5px">{{ comment.body }}</span>
+                </span>
+                <br>
+              </div>
             {% endfor %}
           </div>
         </div>

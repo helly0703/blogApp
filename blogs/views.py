@@ -108,6 +108,7 @@ class PostLikeView(LoginRequiredMixin, View):
 
         like, created = Like.objects.get_or_create(user=profile, post_id=post_id)
         # if liked then unlike post and vice versa
+        msg=''
         if not created:
             if like.value == 'Like':
                 like.value = 'Unlike'

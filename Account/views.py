@@ -31,6 +31,9 @@ class SignUpView(SuccessMessageMixin, CreateView):
         if user_form.is_valid():
             user = user_form.save()
             print(f"USER {user}")
+        else:
+            print("Error")
+            return redirect('register')
         birth = request.POST['birthdate']
         update_profile(self.__class__, birth, user)
         return redirect('login')
@@ -52,9 +55,9 @@ class UpdateProfileView(LoginRequiredMixin, View):
         p_form = AccountUpdateForm(instance=request.user.account)
         context = {
             'u_form': u_form,
-            'p_form': p_form
+            'p_form': p_form,
         }
-        return render(request, 'Account/profile.html', context)
+        return render(request, template_name='Account/profile.html', context=context)
 
     def post(self, request):
         u_form = UserUpdateForm(request.POST, instance=request.user)
@@ -66,7 +69,8 @@ class UpdateProfileView(LoginRequiredMixin, View):
             p_form.save()
             messages.success(request, f'Your account has been updated!')
             return redirect('profile')
-
+        else:
+            return HttpResponse("something went wong some where! yes i said wong!")
 
 class SettingsFormView(LoginRequiredMixin, View):
     def get(self, request):
@@ -86,6 +90,8 @@ class SettingsFormView(LoginRequiredMixin, View):
             u_form.save()
             messages.success(request, f'Your account has been updated!')
             return redirect('settings')
+        else:
+            return HttpResponse("something went wong some where! yes i said wong!")
 
 
 class FriendView(LoginRequiredMixin, ListView):
@@ -103,6 +109,7 @@ class FriendDetailView(LoginRequiredMixin, DetailView):
     template_name = 'Account/friend-detail.html'
 
     def get_context_data(self, **kwargs):
+        print(kwargs)
         context = super().get_context_data(**kwargs)
         context_searched = context['account']
         print(f"context_searched     {context_searched}")
@@ -119,7 +126,7 @@ class FriendDetailView(LoginRequiredMixin, DetailView):
             return context
         except Exception as e:
             SearchHistory.objects.create(searched_by=self.request.user.account,
-                                                    context_searched=context_searched)
+                                         context_searched=context_searched)
             return context
 
 
@@ -143,7 +150,7 @@ class AcceptInvitesView(LoginRequiredMixin, View):
         if rel.status == 'send':
             rel.status = 'accepted'
             rel.save()
-        return JsonResponse({'Success':'Success'})
+        return JsonResponse({'Success': 'Success'})
 
 
 class RejectInvitesView(LoginRequiredMixin, View):
@@ -166,14 +173,13 @@ class InvitesProfileListView(LoginRequiredMixin, ListView):
     #     qs = Account.objects.get_all_profiles_to_invites(user)
     #     return qs
     def get_queryset(self):
-        user=self.request.user.account
+        user = self.request.user.account
         searched_users = SearchHistory.objects.filter(searched_by=user).order_by('-timestamp')[:15]
         qs = []
         for a_user in searched_users:
             qs.append(a_user.context_searched)
             # print(f"sndjkandjkadfjfmkmfkmkafm{a_user.context_searched}")
         return qs
-
 
 
 class ProfileListView(ListView):
@@ -228,11 +234,11 @@ class SendInviteView(LoginRequiredMixin, View):
             if block_user in sender.blockedlist.all():
                 sender.blockedlist.remove(block_user)
             Relationship.objects.create(sender=sender, receiver=receiver, status='send')
-                # thread = Thread.objects.get(
-                #     Q(first_person=user, second_person=block_user) | Q(first_person=block_user, second_person=user))
-                # if thread:
-                #     thread.user_blocked = False
-                #     thread.save()
+            # thread = Thread.objects.get(
+            #     Q(first_person=user, second_person=block_user) | Q(first_person=block_user, second_person=user))
+            # if thread:
+            #     thread.user_blocked = False
+            #     thread.save()
         msg = 'Success'
         return HttpResponse(msg)
 
@@ -266,7 +272,8 @@ class RemoveFriendView(LoginRequiredMixin, View):
             (Q(sender=sender) & Q(receiver=receiver)) | (Q(sender=receiver) & Q(receiver=sender))
         )
         rel.delete()
-        return redirect(request.META.get('HTTP_REFERER'))
+        msg = 'Success'
+        return HttpResponse(msg)
 
 
 class SearchProfileView(LoginRequiredMixin, ListView):
@@ -290,20 +297,21 @@ class BlockUserCreateView(LoginRequiredMixin, View):
         blocked_by = Account.objects.get(user=user)
         block_user = User.objects.get(pk=pk)
         thread = Thread.objects.get(Q(first_person=user, second_person=block_user) | Q(first_person=block_user,
-                                                                                          second_person=user))
+                                                                                       second_person=user))
         thread.user_blocked = True
         thread.save()
         blocked_by.blockedlist.add(block_user)
         if block_user in blocked_by.friendslist.all():
             blocked_by.friendslist.remove(block_user)
             block_user.friendslist.remove(blocked_by)
-            rel = get_object_or_404(Relationship, sender=blocked_by, receiver=block_user.account)
-            if rel:
+            try:
+                rel = Relationship.objects.get(sender=blocked_by, receiver=block_user.account)
                 rel.delete()
-            else:
-                rel = get_object_or_404(Relationship, sender=block_user.account, receiver=blocked_by)
+            except Exception as e:
+                rel = Relationship.objects.get(sender=block_user.account, receiver=blocked_by)
                 rel.delete()
-        return redirect(request.META.get('HTTP_REFERER'))
+        msg = 'Success'
+        return HttpResponse(msg)
 
 
 class MyBlogsView(LoginRequiredMixin, ListView):
@@ -317,4 +325,3 @@ class MyBlogsView(LoginRequiredMixin, ListView):
         context['posts'] = Post.objects.filter(author=user)
         context['categories'] = Category.objects.all()
         return context
-

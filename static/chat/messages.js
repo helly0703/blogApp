@@ -85,10 +85,8 @@ function newMessage(message, sent_by_id, thread_id){
         `
     }
     else{
-        notification = `
-        <i class="fas fa-solid fa-bell"></i>
-        `
-         message_element =`
+        notification = `<i class="fas fa-solid fa-bell"></i>`
+        message_element =`
             <div class="d-flex mb-4 received">
                 <div class="img_cont_msg">
                     <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img_msg">
@@ -101,7 +99,7 @@ function newMessage(message, sent_by_id, thread_id){
         `
     }
     let message_body = $('.messages-wrapper[chat-id="' + chat_id + '"] .msg_card_body')
-    $('#new_message_'+thread_id).append($(notification))
+    $('#thread__'+thread_id).append($(notification))
     message_body.append($(message_element))
 //    message_body.animate({ scrollTop: 2000 }, 3000);
     input_message.val(null);
@@ -127,7 +125,6 @@ $('.contact-li').on('click',function (){
         let notify = $('#new_message_'+thread)
         notify.html('');
         }
-
         },
     });
     // message wrappers
