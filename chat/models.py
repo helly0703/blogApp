@@ -1,13 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
-
-
-# Create your models here.
 from django.db.models import Q
 
 
 class ThreadManager(models.Manager):
-    def by_user(self,**kwargs):
+    def by_user(self, **kwargs):
         user = kwargs.get('user')
         lookup = Q(first_person=user) | Q(second_person=user)
         qs = self.get_queryset().filter(lookup).distinct()
@@ -22,15 +19,18 @@ class Thread(models.Model):
     updated = models.DateTimeField(auto_now=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     new_message_timestamp = models.DateTimeField(blank=True, null=True)
-    new_msg_flag = models.BooleanField(null=True,blank=True)
+    new_msg_flag = models.BooleanField(null=True, blank=True)
     user_blocked = models.BooleanField(default=False)
 
     objects = ThreadManager()
+
     class Meta:
         unique_together = ['first_person', 'second_person']
 
+
 class ChatMessage(models.Model):
-    thread = models.ForeignKey(Thread,null=True,blank=True,on_delete=models.CASCADE,related_name='chatmessage_thread')
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    thread = models.ForeignKey(Thread, null=True, blank=True, on_delete=models.CASCADE,
+                               related_name='chatmessage_thread')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     message = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)

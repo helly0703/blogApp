@@ -1,18 +1,15 @@
-import json
-
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-
-
-# Create your views here.
 from django.views import View
 from .models import Thread
-from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
-
+# Opens messenger page
 class ChatHomeView(LoginRequiredMixin, View):
+    """
+    Returns context that has threads of any user
+    """
     def get(self, request):
         if not self.request.user.is_authenticated:
             return redirect('login')
@@ -28,6 +25,9 @@ class ChatHomeView(LoginRequiredMixin, View):
 
 @csrf_exempt
 def messageViewed(request):
+    """
+    To update if a msg is viewed or not
+    """
     print("bhjdbsfdn")
     thread_id = request.POST.get('thread_id')
     thread_check = Thread.objects.get(id=thread_id)
