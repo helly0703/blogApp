@@ -28,12 +28,7 @@ class AccountManager(models.Manager):
             elif rel.status == 'send':
                 accepted.append(rel.receiver)
                 accepted.append(rel.sender)
-        # print(accepted)
-
         available = [profile for profile in profiles if profile not in accepted]
-
-        # print(available)
-
         return available
 
     def get_all_profiles(self, me):
@@ -173,13 +168,15 @@ class Relationship(models.Model):
     def __str__(self):
         return f'{self.sender}'
 
+
 #
 class SearchHistory(models.Model):
+    """
+    To create and manage a search history of any particular user
+    """
     searched_by = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='searched_by')
-    context_searched = models.ForeignKey(Account,on_delete=models.CASCADE, related_name='context_searched')
+    context_searched = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='context_searched')
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'{self.searched_by}'
-
-

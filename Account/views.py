@@ -1,8 +1,7 @@
 from datetime import datetime
 
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.db.models.signals import post_save
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse_lazy
 from django.views import View
@@ -20,7 +19,11 @@ from blogs.models import Category
 from .signals import update_profile
 
 
+# Registration View
 class SignUpView(SuccessMessageMixin, CreateView):
+    """
+    Provides a signup form, check validation and create an account
+    """
     template_name = 'Account/register.html'
     success_url = reverse_lazy('login')
     form_class = UserRegisterForm
@@ -30,9 +33,7 @@ class SignUpView(SuccessMessageMixin, CreateView):
         user_form = UserRegisterForm(request.POST)
         if user_form.is_valid():
             user = user_form.save()
-            print(f"USER {user}")
         else:
-            print("Error")
             return redirect('register')
         birth = request.POST['birthdate']
         update_profile(self.__class__, birth, user)
@@ -40,16 +41,28 @@ class SignUpView(SuccessMessageMixin, CreateView):
 
 
 class HomeView(LoginRequiredMixin, View):
+    """
+    Upon successfull login redirect to home page
+    """
+
     def get(self, request):
         return redirect('blogs')
 
 
 class ProfileView(LoginRequiredMixin, View):
+    """
+    To view user profile
+    """
+
     def get(self, request):
         return render(request, 'Account/profile_view.html')
 
 
 class UpdateProfileView(LoginRequiredMixin, View):
+    """
+    To update user profile using form
+    """
+
     def get(self, request):
         u_form = UserUpdateForm(instance=request.user)
         p_form = AccountUpdateForm(instance=request.user.account)
@@ -72,7 +85,11 @@ class UpdateProfileView(LoginRequiredMixin, View):
         else:
             return HttpResponse("something went wong some where! yes i said wong!")
 
+
 class SettingsFormView(LoginRequiredMixin, View):
+    """
+    To update user settings using form
+    """
     def get(self, request):
         u_form = AccountSettingsForm(instance=request.user.account)
 
@@ -95,16 +112,25 @@ class SettingsFormView(LoginRequiredMixin, View):
 
 
 class FriendView(LoginRequiredMixin, ListView):
+    """
+    To view friends list view
+    """
     model = Account
     template_name = 'Account/friendspage.html'
 
 
 class BlockedUserView(LoginRequiredMixin, ListView):
+    """
+        To view blocked user list view
+        """
     model = Account
     template_name = 'Account/block_user_page.html'
 
 
 class FriendDetailView(LoginRequiredMixin, DetailView):
+    """
+        To view friends detail view
+        """
     model = Account
     template_name = 'Account/friend-detail.html'
 
@@ -116,8 +142,6 @@ class FriendDetailView(LoginRequiredMixin, DetailView):
         print(f"context     {context}")
         print(f"kwargs     {kwargs}")
 
-        # searches = SearchHistory.objects.get_or_create(searched_by=self.request.user.account,
-        #                                                context_searched=context_searched)
         try:
             searches = SearchHistory.objects.get(searched_by=self.request.user.account,
                                                  context_searched=context_searched)
@@ -131,6 +155,9 @@ class FriendDetailView(LoginRequiredMixin, DetailView):
 
 
 class InvitesReceivedView(LoginRequiredMixin, ListView):
+    """
+    Get all the friend requests
+    """
     model = Relationship
     template_name = 'Account/invites.html'
     context_object_name = 'qs'
@@ -142,6 +169,9 @@ class InvitesReceivedView(LoginRequiredMixin, ListView):
 
 
 class AcceptInvitesView(LoginRequiredMixin, View):
+    """
+    Accepts request and update Relationship status
+    """
     def post(self, request):
         pk = self.request.POST.get('profile_pk')
         sender = Account.objects.get(pk=pk)
@@ -164,25 +194,26 @@ class RejectInvitesView(LoginRequiredMixin, View):
 
 
 class InvitesProfileListView(LoginRequiredMixin, ListView):
+    """
+    View all the profiles that are neither friends nor have they relationship with the active user
+    """
     model = Account
     template_name = 'Account/to_invite_list.html'
     context_object_name = 'qs'
 
-    # def get_queryset(self):
-    #     user = self.request.user
-    #     qs = Account.objects.get_all_profiles_to_invites(user)
-    #     return qs
     def get_queryset(self):
         user = self.request.user.account
         searched_users = SearchHistory.objects.filter(searched_by=user).order_by('-timestamp')[:15]
         qs = []
         for a_user in searched_users:
             qs.append(a_user.context_searched)
-            # print(f"sndjkandjkadfjfmkmfkmkafm{a_user.context_searched}")
         return qs
 
 
 class ProfileListView(ListView):
+    """
+    View all users
+    """
     model = Account
     template_name = 'Account/profile_list.html'
     context_object_name = 'qs'
@@ -193,8 +224,6 @@ class ProfileListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # user = User.objects.get(self.request.user)
-        # profile = Account.objects.get(user=user)
         rel_r = Relationship.objects.filter(sender=self.request.user.account)
         rel_s = Relationship.objects.filter(receiver=self.request.user.account)
         rel_receiver = []
@@ -212,9 +241,11 @@ class ProfileListView(ListView):
 
 
 class SendInviteView(LoginRequiredMixin, View):
+    """
+    Send friend requests
+    """
     def post(self, request):
         pk = self.request.POST.get('profile_pk')
-        # print(f"PK {pk}")
         user = self.request.user
         sender = Account.objects.get(user=user)
         receiver = Account.objects.get(pk=pk)
@@ -224,26 +255,18 @@ class SendInviteView(LoginRequiredMixin, View):
             if block_user in sender.blockedlist.all():
                 sender.blockedlist.remove(block_user)
             Relationship.objects.create(sender=sender, receiver=receiver, status='accepted')
-            # thread = Thread.objects.get(Q(first_person=user, second_person=block_user) | Q(first_person=block_user,
-            #                                                                              second_person=user))
-            # if thread:
-            #     thread.user_blocked = False
-            #     thread.save()
-
         else:
             if block_user in sender.blockedlist.all():
                 sender.blockedlist.remove(block_user)
             Relationship.objects.create(sender=sender, receiver=receiver, status='send')
-            # thread = Thread.objects.get(
-            #     Q(first_person=user, second_person=block_user) | Q(first_person=block_user, second_person=user))
-            # if thread:
-            #     thread.user_blocked = False
-            #     thread.save()
         msg = 'Success'
         return HttpResponse(msg)
 
 
 class UnblockUserView(LoginRequiredMixin, View):
+    """
+    Unblock friends
+    """
     def post(self, request):
         pk = self.request.POST.get('profile_pk')
         # print(f"PK {pk}")
@@ -263,6 +286,9 @@ class UnblockUserView(LoginRequiredMixin, View):
 
 
 class RemoveFriendView(LoginRequiredMixin, View):
+    """
+    Remove from friendslist
+    """
     def post(self, request):
         pk = self.request.POST.get('profile_pk')
         user = self.request.user
@@ -277,6 +303,9 @@ class RemoveFriendView(LoginRequiredMixin, View):
 
 
 class SearchProfileView(LoginRequiredMixin, ListView):
+    """
+    Search a user profile
+    """
     model = Account
     template_name = "Account/to_invite_list.html"
     context_object_name = 'qs'
@@ -291,6 +320,9 @@ class SearchProfileView(LoginRequiredMixin, ListView):
 
 
 class BlockUserCreateView(LoginRequiredMixin, View):
+    """
+    Block a user , remove from friendslist if exists, remove relationship
+    """
     def post(self, request):
         pk = self.request.POST.get('profile_pk')
         user = self.request.user
@@ -315,6 +347,9 @@ class BlockUserCreateView(LoginRequiredMixin, View):
 
 
 class MyBlogsView(LoginRequiredMixin, ListView):
+    """
+    View all blogs of the active user
+    """
     paginate_by = 5
     model = Post
     template_name = 'blogs/feed.html'

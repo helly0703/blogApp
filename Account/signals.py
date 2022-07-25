@@ -5,7 +5,6 @@ from django.dispatch import receiver
 from .models import Account, Relationship
 from chat.models import Thread
 from notifications.models import Notifications
-from django.core.signals import request_finished
 
 
 # To create account instance
@@ -15,6 +14,7 @@ def create_profile(sender, instance, created, **kwargs):
         Account.objects.create(user=instance)
 
 
+#  To add birthdate details upon account creation
 def update_profile(sender, birthdate, username, **kwargs):
     user = User.objects.get(username=username)
     account = Account.objects.get(user=user)
@@ -28,6 +28,7 @@ def save_profile(sender, instance, **kwargs):
     instance.account.save()
 
 
+# To update friendslist upon friend request accepted
 @receiver(post_save, sender=Relationship)
 def post_save_add_to_friends(sender, instance, created, **kwargs):
     sender_ = instance.sender
@@ -35,6 +36,7 @@ def post_save_add_to_friends(sender, instance, created, **kwargs):
     if instance.status == 'accepted':
         sender_.friendslist.add(receiver_.user)
         receiver_.friendslist.add(sender_.user)
+        # To create notifications
         sender_message = f'You and {receiver_.user.account} are now friends'
         receiver_message = f'You and {sender_.user.account} are now friends'
 
@@ -43,7 +45,9 @@ def post_save_add_to_friends(sender, instance, created, **kwargs):
         receiver_notify = Notifications.objects.create(to_user=receiver_.user.account, category='Newfriends',
                                                        message=receiver_message)
         try:
-            existing_thread = Thread.objects.get(Q(first_person=sender_.user,second_person=receiver_.user) | Q(first_person=receiver_.user,second_person=sender_.user))
+            existing_thread = Thread.objects.get(
+                Q(first_person=sender_.user, second_person=receiver_.user) | Q(first_person=receiver_.user,
+                                                                               second_person=sender_.user))
             if existing_thread:
                 existing_thread.user_blocked = False
                 existing_thread.save()
@@ -57,6 +61,7 @@ def post_save_add_to_friends(sender, instance, created, **kwargs):
         receiver_.save()
 
 
+# To update friendslist upon friend request accepted
 @receiver(pre_delete, sender=Relationship)
 def pre_delete_remove_from_friends(sender, instance, **kwargs):
     sender = instance.sender
