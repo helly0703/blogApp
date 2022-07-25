@@ -1,12 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-
-# Create your views here.
 from django.views.generic import ListView
-
 from notifications.models import Notifications
 
 
-class NotificationsListView(LoginRequiredMixin,ListView):
+class NotificationsListView(LoginRequiredMixin, ListView):
+    """
+    Returns all the notification of logged in user
+    """
     model = Notifications
     template_name = 'Notifications/notifications.html'
     context_object_name = 'qs'

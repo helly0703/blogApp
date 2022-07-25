@@ -3,6 +3,7 @@ from Account.models import Account
 from django.utils import timezone
 
 
+# Notification model to save notifications of any user
 class Notifications(models.Model):
     to_user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='to_user')
     message = models.CharField(default=' ', null=True, max_length=100)
