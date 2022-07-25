@@ -7,6 +7,7 @@ from PIL import Image
 from Account.models import Account
 
 
+# Post model
 class Post(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()
@@ -21,17 +22,29 @@ class Post(models.Model):
         return self.title
 
     def num_of_likes(self):
+        """
+        To get likes count for any particular post
+        """
         return self.liked.all().count()
 
     def num_of_comments(self):
+        """
+        To get comments count for any particular post
+        """
         comments = Comment.objects.all().filter(post=self).count()
         return comments
 
     def get_comments(self):
+        """
+        To get all comments for any particular post
+        """
         comment_list = Comment.objects.all().filter(post=self)[:5]
         return comment_list
 
     def save(self, *args, **kwargs):
+        """
+        Save image for the post
+        """
         super().save(*args, **kwargs)
 
         if self.image:
@@ -60,6 +73,7 @@ class Category(models.Model):
         return reverse('blogs')
 
 
+# Model to manage comments given to any post by any user
 class Comment(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
@@ -79,6 +93,7 @@ LIKE_CHOICES = (
 )
 
 
+# Model to manage the likes given by any user to any post
 class Like(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
@@ -96,6 +111,7 @@ SAVE_CHOICES = (
 )
 
 
+# Model to store saved post of any user
 class SavePost(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)

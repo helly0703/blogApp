@@ -16,9 +16,13 @@ from .models import Post, Like, Comment, SavePost, Category
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 
-# Create your views here.
 # For displaying blogs in the feed
 class HomeView(LoginRequiredMixin, ListView):
+    """
+    Displays all blogs that are posted by friends,public users including personal blog
+    Returns context that has posts and categories
+    Added pagination
+    """
     paginate_by = 5
     model = Post
     template_name = 'blogs/feed.html'
@@ -48,12 +52,18 @@ class HomeView(LoginRequiredMixin, ListView):
 
 # Viewing individual post
 class PostDetailView(LoginRequiredMixin, DetailView):
+    """
+    To Read a post in detail
+    """
     model = Post
     template_name = 'blogs/post_detail.html'
 
 
 # For creating new post
 class PostCreateView(LoginRequiredMixin, CreateView):
+    """
+    If user login , allow create post
+    """
     model = Post
     form_class = BlogCreateForm
     success_url = reverse_lazy('blogs')
@@ -65,6 +75,9 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
 # For updating post if post author is user
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """
+    If logged in user is the post author allow updating the post
+    """
     model = Post
     form_class = BlogCreateForm
     success_url = reverse_lazy('blogs')
@@ -83,6 +96,9 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 # For deleting post if post author is user
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """
+    If logged in user is the post author allow to delete the post
+    """
     model = Post
     success_url = reverse_lazy('blogs')
 
@@ -96,6 +112,10 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 # To like-unlike posts
 class PostLikeView(LoginRequiredMixin, View):
+    """
+    Allows users to like or unlike any post
+    """
+
     def post(self, request, *args, **kwargs):
         user = self.request.user
         post_id = request.POST.get('post_id')
@@ -108,7 +128,7 @@ class PostLikeView(LoginRequiredMixin, View):
 
         like, created = Like.objects.get_or_create(user=profile, post_id=post_id)
         # if liked then unlike post and vice versa
-        msg=''
+        msg = ''
         if not created:
             if like.value == 'Like':
                 like.value = 'Unlike'
@@ -123,6 +143,10 @@ class PostLikeView(LoginRequiredMixin, View):
 
 # To comment posts
 class PostCommentCreateView(LoginRequiredMixin, View):
+    """
+    Takes form data and returns Success msg
+    Allows user to comment any post
+    """
 
     def post(self, request, *args, **kwargs):
         user = self.request.user
@@ -136,6 +160,9 @@ class PostCommentCreateView(LoginRequiredMixin, View):
 
 #  To view posts
 class PostCommentListView(LoginRequiredMixin, ListView):
+    """
+    Takes post id as parameter and returns all the comments for that particular post
+    """
     model = Comment
     template_name = 'blogs/feed.html'
 
@@ -147,6 +174,9 @@ class PostCommentListView(LoginRequiredMixin, ListView):
 
 # To view saved posts
 class SavedPostListView(LoginRequiredMixin, ListView):
+    """
+    Returns posts saved by the user
+    """
     paginate_by = 5
     model = Post
     template_name = 'blogs/saved_blogs.html'
@@ -162,6 +192,10 @@ class SavedPostListView(LoginRequiredMixin, ListView):
 
 # To save-unsave posts
 class PostSaveView(LoginRequiredMixin, View):
+    """
+    Takes post_id as form data and saves that particular post for current logged in user
+    """
+
     def post(self, request, *args, **kwargs):
         user = self.request.user
         post_id = request.POST.get('post_id')
@@ -193,6 +227,9 @@ class PostSaveView(LoginRequiredMixin, View):
 
 # To filter posts by category
 class PostFilterView(LoginRequiredMixin, ListView):
+    """
+    Takes category name and returns context that has filtered posts and active category
+    """
     paginate_by = 5
     model = Post
     template_name = "blogs/feed.html"
@@ -219,6 +256,9 @@ class PostFilterView(LoginRequiredMixin, ListView):
 
 # View category
 class CategoryListView(LoginRequiredMixin, ListView):
+    """
+    Provides all the available categories
+    """
     model = Category
     template_name = "blogs/filter.html"
     context_object_name = 'qs'
@@ -229,6 +269,10 @@ class CategoryListView(LoginRequiredMixin, ListView):
 
 
 class SearchBlogView(LoginRequiredMixin, ListView):
+    """
+    Search a blog in the feed
+    Takes search-field as form data returns context that is being searched
+    """
     paginate_by = 5
     model = Post
     template_name = "blogs/feed.html"
@@ -245,4 +289,3 @@ class SearchBlogView(LoginRequiredMixin, ListView):
         context['posts'] = qs
         context['categories'] = Category.objects.all()
         return context
-

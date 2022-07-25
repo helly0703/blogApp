@@ -8,6 +8,9 @@ for item in choices:
 
 
 class BlogCreateForm(forms.ModelForm):
+    """
+    Form to create blog as well as update blog
+    """
     image = forms.ImageField(required=False)
 
     class Meta:
